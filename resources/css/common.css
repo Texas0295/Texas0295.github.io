@@ -1,0 +1,82 @@
+html{
+    font-family: 'Cascadia Code', Consolas, Helvetica, 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+    color: #c9d1d9;
+    background-color:#0d1117
+}
+
+body {
+    max-width: 800px;
+    padding: 0 14px;
+    margin: 0 auto;
+}
+
+.navigation-bar {
+    padding: 40px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navigation-bar .menu{
+    margin-right: -9px;
+    text-align: right;
+    user-select: none;
+}
+
+.navigation-bar .menu a{
+    display: inline-block;
+    font-size: 20px;
+    color: #c9d1d9;
+    text-decoration-line: none;
+    margin: 4px 9px;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.logo{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    -webkit-user-drag: none;
+    user-select: none;
+    box-shadow: 0 0 6px 1px rgba(0, 0, 0, 0.18);
+}
+
+.index-sentence{
+    display: relative;
+    margin: auto;
+    width: 24%;
+    padding-top: 25%;
+}
+
+.typed-out{
+    overflow: hidden;
+    border-right: .1em solid #c9d1d9;
+    font-size: 20pt;
+    white-space: nowrap;
+    width: 0;
+    animation: typing 1s steps(20,end) forwards,
+        blink 0.8s infinite;
+
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+@keyframes blink {
+    from { border-color: transparent }
+    to { border-color: #c9d1d9; }
+}
+
+.article-list{
+    font-size: 15pt;
+    font-weight: 1000;
+}
+
+.article-list a{
+    color: #c9d1d9;
+    text-decoration-line: none;
+}
