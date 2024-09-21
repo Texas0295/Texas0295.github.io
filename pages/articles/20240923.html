@@ -22,7 +22,11 @@
       </nav>
     </div>
     <h1>透過CloudFlare將github pages綁定至自訂網域</h1>
-    <p>對於github上託管的網頁，github會分配(username).github.io作為網域</p>
+    <p>
+      對於在GitHub上託管的網頁，GitHub會為每個使用者或專案分配一個預設網域。用戶的個人或組織頁面會使用
+      (username).github.io，而專案頁面則會使用 (username).github.io/(repository)
+      作為其預設
+    </p>
     <p>如果需要自訂網域，可以透過CloudFlare(CF)進行</p>
     <h2>要求</h2>
     <ul>
@@ -32,10 +36,17 @@
     <p>以該部落格的網域(texas-0295.xyz)為例，在DNS記錄中新增兩條別名解析</p>
     <p><img src="/resources/img/20240923-1.png" alt="" /></p>
     <p>
+      需要注意的是，<code>www</code> 原理上是可選的，但不建議將其去除。因為<code
+        >www</code
+      >
+      作為一個為大眾熟知的子網域，會有很大機率使得用戶會輸入 www.texas-0295.xyz
+      導致無法訪問。因此建議保留並綁定這個子網域。
+    </p>
+    <p>
       之後在Github專案的<code>Setting &gt; Pages</code>中找到Custom domain
       ，填入你的網域並保存
     </p>
-    <p>Github會檢查你的DNS</p>
+    <p>Github會檢查及驗證你的DNS記錄</p>
     <p><img src="/resources/img/20240923-2.png" alt="" /></p>
     <p>完成後即可透過此網域訪問網頁</p>
     <p><img src="/resources/img/20240923-3.png" alt="" /></p>
