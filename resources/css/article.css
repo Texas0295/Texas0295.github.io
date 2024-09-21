@@ -5,7 +5,7 @@ html{
 }
 
 body {
-    max-width: 800px;
+    max-width: 1000px;
     padding: 0 14px;
     margin: 0 auto;
 }
@@ -15,6 +15,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    border-bottom: #c9d1d9 1px solid;
 }
 
 .navigation-bar .menu{

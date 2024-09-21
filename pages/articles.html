@@ -6,36 +6,23 @@
   <link rel="stylesheet" type="text/css" href="/resources/css/common.css" />
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      // 請求後端 API 獲取 articles 資料夾中的 HTML 檔案
-      fetch("/api/get_articles")
+      // 從 articles.json 讀取檔案列表
+      fetch("/resources/js/articles.json")
         .then((response) => response.json())
-        .then((files) => {
+        .then((articles) => {
           const list = document.getElementById("article-list");
 
-          files.forEach((file) => {
-            const filePath = `/pages/articles/${file}`;
-            const fileName = file.replace(".html", "");
+          articles.forEach((article) => {
+            const listItem = document.createElement("li");
+            const link = document.createElement("a");
+            link.href = `/pages/articles/${article.file}`;
+            link.textContent = `${article.title} - ${article.date}`;
 
-            // 請求每篇文章來獲取 <h1> 標題
-            fetch(filePath)
-              .then((response) => response.text())
-              .then((htmlContent) => {
-                // 創建 DOM 解析器來讀取 <h1> 標籤
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(htmlContent, "text/html");
-                const title = doc.querySelector("h1")?.innerText || "無標題";
-
-                // 創建文章列表項目
-                const listItem = document.createElement("li");
-                const link = document.createElement("a");
-                link.href = filePath;
-                link.textContent = `${title} - ${fileName}`;
-
-                listItem.appendChild(link);
-                list.appendChild(listItem);
-              });
+            listItem.appendChild(link);
+            list.appendChild(listItem);
           });
-        });
+        })
+        .catch((error) => console.error("無法讀取文章列表", error));
     });
   </script>
 </head>
