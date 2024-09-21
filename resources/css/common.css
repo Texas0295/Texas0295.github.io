@@ -98,12 +98,15 @@ ul#article-list a{
 }
 
 ul#article-list a{
+    padding-top: 20px;
+    padding-bottom: 20px;
+    display: block;
     color: #c9d1d9;
     text-decoration-line: none;
 }
 
 ul#article-list {
-    padding: 0;
+    padding-top: 10px;
 }
 
 .otherlinks a{
