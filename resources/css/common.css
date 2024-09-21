@@ -91,3 +91,7 @@ ul#article-list {
     color: #c9d1d9;
     text-decoration-line: none;
 }
+
+ul#article-list li{
+    list-style-type: none;
+}
