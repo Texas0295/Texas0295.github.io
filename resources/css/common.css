@@ -47,7 +47,7 @@ body {
 .index-sentence{
     display: relative;
     margin: auto;
-    width: 24%;
+    width: 200px;
     padding-top: 25%;
 }
 
@@ -64,7 +64,7 @@ body {
 
 @keyframes typing {
     from { width: 0 }
-    to { width: 80% }
+    to { width: 95% }
 }
 
 @keyframes blink {
