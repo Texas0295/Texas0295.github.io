@@ -5,9 +5,28 @@ html{
 }
 
 body {
-    max-width: 60vw;
-    padding: 0 14px;
     margin: 0 auto;
+    padding: 0 14px;
+    box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+    body {
+        max-width: 1000px;
+    }
+}
+
+@media (max-width: 1023px) {
+    body {
+        max-width: 100%;
+    }
+}
+
+@media only screen and (min-device-width: 320px) and (max-device-width: 768px) {
+    img {
+        max-width: 100%;
+        height: auto;
+    }
 }
 
 .navigation-bar {
