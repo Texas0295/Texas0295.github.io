@@ -1,7 +1,7 @@
 html{
     font-family: 'Cascadia Code', Consolas, Helvetica, 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
     color: #c9d1d9;
-    background-color:#0d1117
+    background-color:#000000
 }
 
 body {
@@ -71,12 +71,22 @@ body {
     to { border-color: #c9d1d9; }
 }
 
-.article-list{
+ul#article-list a{
     font-size: 15pt;
     font-weight: 1000;
+    
 }
 
-.article-list a{
+ul#article-list a{
+    color: #c9d1d9;
+    text-decoration-line: none;
+}
+
+ul#article-list {
+    padding: 0;
+}
+
+.otherlinks a{
     color: #c9d1d9;
     text-decoration-line: none;
 }
