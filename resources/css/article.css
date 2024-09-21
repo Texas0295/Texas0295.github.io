@@ -54,3 +54,7 @@ code {
 pre {
     background-color: #181f29;
 }
+
+img {
+    max-width: 1000px;
+}

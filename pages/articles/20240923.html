@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>透過CloudFlare將github pages綁定至自訂網域 - Texas0295`s blog</title>
+    <meta name="description" content="Texas0295的個人博客" />
+    <meta http-equiv="content-language" content="zh-hant" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta theme-color="#000000" />
+    <meta name="renderer" content="webkit" />
+    <link rel="icon" href="/resources/img/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="/resources/css/article.css" />
+  </head>
+  <body>
+    <div class="navigation-bar">
+      <img src="/resources/img/info-img.jpg" class="logo" />
+      <nav class="menu">
+        <a href="/">首頁</a>
+        <a href="/pages/articles.html">文章</a>
+        <a href="/pages/otherlinks.html">外鏈</a>
+        <a href="/pages/about.html">關於</a>
+      </nav>
+    </div>
+    <h1>透過CloudFlare將github pages綁定至自訂網域</h1>
+    <p>對於github上託管的網頁，github會分配(username).github.io作為網域</p>
+    <p>如果需要自訂網域，可以透過CloudFlare(CF)進行</p>
+    <h2>要求</h2>
+    <ul>
+      <li>已經購置了網域並綁定了CF的DNS伺服器</li>
+    </ul>
+    <h2>過程</h2>
+    <p>以該部落格的網域(texas-0295.xyz)為例，在DNS記錄中新增三條別名解析</p>
+    <p><img src="/resources/img/20240923-1.png" alt="" /></p>
+    <p>
+      之後在Github專案的<code>Setting &gt; Pages</code>中找到Custom domain
+      ，填入你的網域並保存
+    </p>
+    <p>Github會檢查你的DNS</p>
+    <p><img src="/resources/img/20240923-2.png" alt="" /></p>
+    <p>完成後即可透過此網域訪問網頁</p>
+    <p><img src="/resources/img/20240923-3.png" alt="" /></p>
+  </body>
+</html>
