@@ -56,5 +56,6 @@ pre {
 }
 
 img {
-    max-width: 1000px;
+    max-width: 100%;
+    height: auto;
 }
