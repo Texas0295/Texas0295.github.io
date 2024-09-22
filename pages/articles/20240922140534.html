@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Rust: 解參考（Dereferencing） - Texas0295`s blog</title>
+    <meta name="description" content="Texas0295的個人博客" />
+    <meta http-equiv="content-language" content="zh-hant" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta theme-color="#000000" />
+    <meta name="renderer" content="webkit" />
+    <link rel="icon" href="/resources/img/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="/resources/css/article.css" />
+  </head>
+  <body>
+    <div class="navigation-bar">
+      <a href="/"><img src="/resources/img/info-img.jpg" class="logo" /></a>
+      <nav class="menu">
+        <a href="/">首頁</a>
+        <a href="/pages/articles.html">文章</a>
+        <a href="/pages/otherlinks.html">外鏈</a>
+        <a href="/pages/about.html">關於</a>
+      </nav>
+    </div>
+    <h1>Rust: 解參考（Dereferencing）</h1>
+    <p>
+      在 Rust
+      中，<strong>解參考</strong>（dereferencing）是從一個參考或指針型別中取得其所指向的值的操作
+    </p>
+    <p>
+      解參考操作涵蓋了從基本參考、智能指針到原生指針的多種型別，並透過
+      <code>Deref</code> 和 <code>DerefMut</code> trait
+      支持自定義解參考行為，實現靈活的解參考和自動解參考
+    </p>
+    <h3>基本的參考解參考 (<code>&amp;T</code> 和 <code>&amp;mut T</code>)</h3>
+    <p>
+      <strong>不可變參考</strong> (<code>&amp;T</code>) 和
+      <strong>可變參考</strong> (<code>&amp;mut T</code>)
+      是最基本的參考型別，它們指向一個資料，但自己並不持有所有權
+    </p>
+    <p>使用 <code>*</code> 來解參考取得它所指向的值</p>
+    <pre><code class="language-rust">fn main() {
+    let x = 10;
+    let y = &amp;x;        // 不可變參考
+    let mut z = 20;    
+    let z_ref = &amp;mut z; // 可變參考
+
+    println!("*y = {}", *y); // 解參考不可變參考，結果是 10
+    *z_ref += 1;            // 解參考可變參考並修改它的值
+    println!("*z_ref = {}", *z_ref); // 結果是 21
+}
+</code></pre>
+    <h3>解構模式中的解參考</h3>
+    <p>在模式匹配或變數宣告中，通過解構的方式來解參考：</p>
+    <pre><code class="language-rust">fn main() {
+    let x = 42;
+    let y = &amp;x;
+
+    let &amp;z = y; // 解構不可變參考，z 是 u32 型別
+    println!("z = {}", z); // z 的值是 42
+}
+</code></pre>
+    <p>也可以對可變參考進行解構：</p>
+    <pre><code class="language-rust">fn main() {
+    let mut x = 42;
+    let y = &amp;mut x;
+
+    let z = *y; // 解構可變參考，z 是 u32 型別
+    z += 1;
+    println!("z = {}", z); // z 的值是 43
+}
+</code></pre>
+    <h3>Box 型別解參考 (<code>Box&lt;T&gt;</code>)</h3>
+    <p><code>Box&lt;T&gt;</code> 是一個智能指針，用來在堆上分配資料</p>
+    <p>解參考 <code>Box</code> 後可以取得其所指向的值：</p>
+    <pre><code class="language-rust">fn main() {
+    let b = Box::new(5); // 在堆上分配一個值 5
+    println!("b = {}", *b); // 解參考 Box，結果是 5
+}
+</code></pre>
+    <h3>Rc 型別解參考 (<code>Rc&lt;T&gt;</code>)</h3>
+    <p>
+      <code>Rc&lt;T&gt;</code>
+      是參考計數智能指針，適用於單線程環境下的多重所有權
+    </p>
+    <p>可以像解參考普通參考一樣解參考 <code>Rc</code>：</p>
+    <pre><code class="language-rust">use std::rc::Rc;
+
+fn main() {
+    let rc = Rc::new(10); // Rc 擁有值 10
+    println!("rc = {}", *rc); // 解參考 Rc，結果是 10
+}
+</code></pre>
+    <h3>Arc 型別解參考 (<code>Arc&lt;T&gt;</code>)</h3>
+    <p>
+      <code>Arc&lt;T&gt;</code> 是適用於多線程環境的參考計數智能指針，與
+      <code>Rc&lt;T&gt;</code> 類似，但可以在多線程間共享
+    </p>
+    <p>解參考方式相同：</p>
+    <pre><code class="language-rust">use std::sync::Arc;
+
+fn main() {
+    let arc = Arc::new(10);
+    println!("arc = {}", *arc); // 解參考 Arc，結果是 10
+}
+</code></pre>
+    <h3>解參考指針型別 (<code>*const T</code> 和 <code>*mut T</code>)</h3>
+    <p>
+      原生指針（<code>*const T</code> 和
+      <code>*mut T</code>）是未經檢查的指針，使用它們時需要
+      <code>unsafe</code> 區塊
+    </p>
+    <p>透過 <code>*</code> 操作符可以解參考這些指針：</p>
+    <pre><code class="language-rust">fn main() {
+    let x = 42;
+    let ptr = &amp;x as *const i32; // 不可變指針
+    let mut y = 100;
+    let mut_ptr = &amp;mut y as *mut i32; // 可變指針
+
+    unsafe {
+        println!("ptr = {}", *ptr); // 解參考不可變指針
+        *mut_ptr += 1; // 解參考可變指針並修改值
+        println!("mut_ptr = {}", *mut_ptr); // 結果是 101
+    }
+}
+</code></pre>
+    <h3>Deref 和 DerefMut trait</h3>
+    <p>
+      自定義型別可以透過實作 <code>Deref</code> 和 <code>DerefMut</code> trait
+      來支持解參考行為，允許像解參考指標一樣操作自定義型別
+    </p>
+    <pre><code class="language-rust">use std::ops::{Deref, DerefMut};
+
+struct MyBox&lt;T&gt;(T);
+
+impl&lt;T&gt; MyBox&lt;T&gt; {
+    fn new(x: T) -&gt; MyBox&lt;T&gt; {
+        MyBox(x)
+    }
+}
+
+// 實作 Deref 以支持解參考行為
+impl&lt;T&gt; Deref for MyBox&lt;T&gt; {
+    type Target = T;
+
+    fn deref(&amp;self) -&gt; &amp;T {
+        &amp;self.0
+    }
+}
+
+// 實作 DerefMut 以支持可變解參考行為
+impl&lt;T&gt; DerefMut for MyBox&lt;T&gt; {
+    fn deref_mut(&amp;mut self) -&gt; &amp;mut T {
+        &amp;mut self.0
+    }
+}
+
+fn main() {
+    let mut x = MyBox::new(5);
+    *x += 1; // 解參考 MyBox 並修改它的值
+    println!("x = {}", *x); // 結果是 6
+}
+</code></pre>
+    <h3>解參考自動解參考（Deref Coercion）</h3>
+    <p>
+      當 Rust 發現某個型別實作了 <code>Deref</code> 或
+      <code>DerefMut</code>，其會自動嘗試進行解參考
+    </p>
+    <p>
+      通常發生在函數傳遞時，可以自動將 <code>&amp;MyBox&lt;T&gt;</code> 轉換為
+      <code>&amp;T</code>。
+    </p>
+    <pre><code class="language-rust">fn hello(name: &amp;str) {
+    println!("Hello, {}!", name);
+}
+
+fn main() {
+    let m = MyBox::new(String::from("Rust"));
+    hello(&amp;m); // 自動將 &amp;MyBox&lt;String&gt; 解參考為 &amp;String，再解參考為 &amp;str
+}
+</code></pre>
+    <h3>解參考到方法調用（Method Call Deref Coercion）</h3>
+    <p>Rust 可以在方法調用中自動解參考</p>
+    <p>
+      如果某個型別實作了
+      <code>Deref</code>，可以直接調用被解參考型別的方法，而不需要手動解參考
+    </p>
+    <pre><code class="language-rust">fn main() {
+    let s = MyBox::new(String::from("Hello"));
+    println!("{}", s.len()); // 自動解參考，調用 String 的 len 方法
+}
+</code></pre>
+    <hr />
+    <p>
+      此文章採用<a
+        href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
+        target="_blank"
+        rel="license noopener noreferrer"
+        style="display: inline-block"
+        >CC BY 4.0</a
+      >協議共享
+    </p>
+    <p>於 2024-09-22</p>
+  </body>
+</html>

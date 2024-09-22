@@ -13,5 +13,10 @@
     "title": "透過CloudFlare將github pages綁定至自訂網域",
     "file": "20240922103310.html",
     "date": "2024-09-22"
+  },
+  {
+    "title": "Rust: 解參考（Dereferencing）",
+    "file": "20240922140534.html",
+    "date": "2024-09-22"
   }
 ]
