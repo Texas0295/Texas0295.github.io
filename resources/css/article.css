@@ -70,7 +70,19 @@ code {
     font-size: 105%;
 }
 
+
+
 pre {
+    counter-reset: line;
+    position: relative;
+    padding-left: 20px;
+
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-break: break-all;
     background-color: #181f29;
 }
 
