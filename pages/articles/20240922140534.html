@@ -33,7 +33,7 @@
       <code>Deref</code> 和 <code>DerefMut</code> trait
       支持自定義解參考行為，實現靈活的解參考和自動解參考
     </p>
-    <h3>基本的參考解參考 (<code>&amp;T</code> 和 <code>&amp;mut T</code>)</h3>
+    <h3>基本解參考 (<code>&amp;T</code> 和 <code>&amp;mut T</code>)</h3>
     <p>
       <strong>不可變參考</strong> (<code>&amp;T</code>) 和
       <strong>可變參考</strong> (<code>&amp;mut T</code>)
@@ -105,7 +105,7 @@ fn main() {
     println!("arc = {}", *arc); // 解參考 Arc，結果是 10
 }
 </code></pre>
-    <h3>解參考指針型別 (<code>*const T</code> 和 <code>*mut T</code>)</h3>
+    <h3>指針型別解參考 (<code>*const T</code> 和 <code>*mut T</code>)</h3>
     <p>
       原生指針（<code>*const T</code> 和
       <code>*mut T</code>）是未經檢查的指針，使用它們時需要
@@ -162,7 +162,7 @@ fn main() {
     println!("x = {}", *x); // 結果是 6
 }
 </code></pre>
-    <h3>解參考自動解參考（Deref Coercion）</h3>
+    <h3>自動解參考（Deref Coercion）</h3>
     <p>
       當 Rust 發現某個型別實作了 <code>Deref</code> 或
       <code>DerefMut</code>，其會自動嘗試進行解參考
@@ -180,7 +180,7 @@ fn main() {
     hello(&amp;m); // 自動將 &amp;MyBox&lt;String&gt; 解參考為 &amp;String，再解參考為 &amp;str
 }
 </code></pre>
-    <h3>解參考到方法調用（Method Call Deref Coercion）</h3>
+    <h3>方法調用中的自動解參考（Method Call Deref Coercion）</h3>
     <p>Rust 可以在方法調用中自動解參考</p>
     <p>
       如果某個型別實作了
