@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+<clannel>
+<title>Texas0295`s blog</title>
+<link>https://texas-0295.xyz/</link>
+<description>人生は意味無し</description>
+<language>zh-TW</language>
+<item>
+<title>ハイエク：隷属への道(Test)</title>
+<link>https://texas-0295.xyz/pages/articles/20240921.html</link>
+<guid>https://texas-0295.xyz/pages/articles/20240921.html</guid>
+<pubDate>Sun, 22 Sep 2024 00:00:01 GMT</pubDate>
+<description>あいうえおかきくけこさしすせそたちつてと</description>
+</item>
+<item>
+<title>更新此部落格的流程</title>
+<link>https://texas-0295.xyz/pages/articles/20240922103241.html</link>
+<guid>https://texas-0295.xyz/pages/articles/20240922103241.html</guid>
+<pubDate>Sun, 22 Sep 2024 10:32:41 GMT</pubDate>
+<description>在做前端這方面沒有什麼知識，打算從基本HTML開始寫一個簡單案例，所以沒有運用Jekyll之類的輔助工具</description>
+</item>
+<item>
+<title>透過CloudFlare將github pages綁定至自訂網域</title>
+<link>https://texas-0295.xyz/pages/articles/20240922103310.html</link>
+<guid>https://texas-0295.xyz/pages/articles/20240922103310.html</guid>
+<pubDate>Sun, 22 Sep 2024 10:33:10 GMT</pubDate>
+<description>對於在GitHub上託管的網頁，GitHub會為每個使用者或專案分配一個預設網域。</description>
+</item>
+<item>
+<title>[ノート]動詞の未然形とその使い方</title>
+<link>https://texas-0295.xyz/pages/articles/20240927191426.html</link>
+<guid>https://texas-0295.xyz/pages/articles/20240927191426.html</guid>
+<pubDate>Sun, 22 Sep 2024 19:14:26 GMT</pubDate>
+<description>五段動詞は、ア段未然形とオ段未然形があるから、実際の接続によって、語尾を変換する。</description>
+</item>
+<item>
+<title>Rust: 解參考（Dereferencing）</title>
+<link>https://texas-0295.xyz/pages/articles/20240922140534.html</link>
+<guid>https://texas-0295.xyz/pages/articles/20240922140534.html</guid>
+<pubDate>Sun, 22 Sep 2024 14:05:34 GMT</pubDate>
+<description>在 Rust 中，解參考（dereferencing）是從一個參考或指針型別中取得其所指向的值的操作</description>
+</item>
+</clannel>
+</rss>
