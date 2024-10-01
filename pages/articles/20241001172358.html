@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>在裸機上執行的Rust二進制檔 - Texas0295`s blog</title>
+    <meta name="description" content="Texas0295的個人博客" />
+    <meta http-equiv="content-language" content="zh-hant" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta theme-color="#000000" />
+    <meta name="renderer" content="webkit" />
+    <link rel="icon" href="/favicon.ico" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/resources/css/article.css?v=1.0"
+    />
+    <script src="/resources/js/darkmode.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <button id="theme-switch">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z"
+          />
+        </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z"
+          />
+        </svg>
+      </button>
+    </header>
+    <div class="navigation-bar">
+      <a href="/"
+        ><img src="/resources/img/site/info-img.jpg" class="logo"
+      /></a>
+      <nav class="menu">
+        <a href="/">首頁</a>
+        <a href="/pages/articles.html">文章</a>
+        <a href="/pages/otherlinks.html">外鏈</a>
+        <a href="/pages/about.html">關於</a>
+      </nav>
+    </div>
+    <h1>在裸機上執行的Rust二進制檔</h1>
+    <h2>no_std</h2>
+    <p>
+      要編寫作業系統核心，必須在去除對任何作業系統的抽象或任何特定硬體的依賴的情形下讓程式<strong>獨立運行</strong>在裸機(bare-metal)上
+    </p>
+    <p>
+      這意味著無法使用Rust的<a href="https://doc.rust-lang.org/std/"
+        >標準函式庫</a
+      >
+    </p>
+    <p>在Rust中，使用<code>#![no_std]</code>屬性來停用標準函式庫</p>
+    <pre><code class="language-rust">#![no_std]
+
+fn main(){
+	println!("Hello World");
+}
+</code></pre>
+    <p>進行<code>cargo build</code>，得到一行報錯資訊</p>
+    <p><code>error: cannot find marco "println" in this scope</code></p>
+    <p>
+      由於println巨集屬於標準函式庫的一部分(其作用為列印追加了換行符的內容至標準輸出，標準輸出顯然依賴於特定的作業系統)，因此無法在no_std環境下使用它
+    </p>
+    <p>去掉<code>println!("Hello World")</code> 後再進行一次編譯：</p>
+    <pre><code>error: `#[panic_handler]` function required, but not found
+error: language item required, but not found: `eh_personality`
+</code></pre>
+    <p>
+      編譯器提示缺少<code>#[panic_handler]</code>與<code>language item</code>
+    </p>
+    <h2>實作 panic handler</h2>
+    <p>
+      <code>panic handler</code
+      >被定義為發生panic時編譯器需呼叫的函式，標準庫中已經實作了一個，但我們沒有使用標準函式庫，因而要定義自己的handler
+    </p>
+    <pre><code class="language-rust">use core::panic::PanicInfo;
+
+#[panic_handler]
+fn panic(_info: &amp;PanicInfo) -&gt; ! {
+	loop{}
+}
+</code></pre>
+    <p>目前這個handler什麼事也不做，只進行一個無限迴圈</p>
+    <p>
+      因為這個函式不會返回，所以是<a
+        href="https://doc.rust-lang.org/1.30.0/book/first-edition/functions.html#diverging-functions"
+        >發散的</a
+      >
+      ，發散函式的返回形態是<code>!</code>
+    </p>
+    <h2>eh_personality Language Item</h2>
+    <p>eh_personality標記的函式被用來實作堆疊回溯</p>
+    <p>
+      當panic發生時，Rust使用堆疊回溯對所有存放於堆疊上的變數執行他們的解構子(destructor)來確保所有的記憶體得到釋放
+    </p>
+    <p>堆疊回溯比較複雜，也會用到一些特定於作業系統的函式庫，因此不需要它</p>
+    <h2>停用回溯</h2>
+    <p>
+      Rust也提供了直接在程式panic時中止的選項以停用回溯標誌訊息的產生，要啟用這個選項的最簡單方式是在
+      <code>Cargo.toml</code> 中加入以下選項
+    </p>
+    <pre><code class="language-toml">[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+</code></pre>
+    <p>之後編譯器就不會要求<code>eh_personality</code> language item</p>
+    <h2>start</h2>
+    <p>
+      在一個使用標準函式庫的Rust函式中，程式從一個名為<code>crt0</code>(C
+      runtime
+      zero)的執行時函式庫開始，其設置C程式的執行環境(包含了建立堆疊及可執行程式參數的傳入)
+    </p>
+    <p>
+      之後<code>crt0</code>會呼叫Rust的執行時入口點，其由<code>start</code>標記
+    </p>
+    <p>Rust的執行時系統比較小巧，只用來處理諸如堆疊溢位，列印panic訊息的工作</p>
+    <p>最後執行時系統呼叫<code>main</code>函式</p>
+    <p>
+      裸機上的執行檔無法存取Rust執行時系統或<code>crt0</code>，因此需要定義自己的入口點
+    </p>
+    <p>
+      實作<code>start</code>是無效的，因為其由<code>crt0</code>呼叫，因此需要直接覆寫<code>crt0</code>的入口點
+    </p>
+    <h2>覆寫crt0的入口點</h2>
+    <p>使用<code>#![no_main]</code>告訴編譯器不使用默認的呼叫順序</p>
+    <pre><code class="language-rust">#![no_std]
+#![no_main]
+
+use core::panic::PanicInfo;
+
+#[panic_handler]
+fn panic(_info: &amp;PanicInfo) -&gt; !{
+	loop{}
+}
+</code></pre>
+    <p>然後重寫入口點，定義函式<code>_start</code></p>
+    <pre><code class="language-rust">#[no_mangle]
+pub extern "C" fn _start() -&gt; !{
+	loop{}
+}
+</code></pre>
+    <p>
+      使用<code>#[no_mangle]</code>停用<a
+        href="https://en.wikipedia.org/wiki/Name_mangling"
+        >名稱重整</a
+      >來確保Rust輸出的函式名稱是<code>_start</code>而不是<code>_ZN3blog_os4_start7hb173fedf945531caE</code>這種為了唯一性產生的名稱
+    </p>
+    <p>
+      函式還有<code>extern "C"</code>的標記，這被用來告知編譯器其應當採用<a
+        href="https://en.wikipedia.org/wiki/Calling_convention"
+        >C的呼叫慣例</a
+      >，而非Rust
+    </p>
+    <p>函式名稱<code>_start</code>是為了符合大多數系統的入口點名稱</p>
+    <p>
+      函式被標記為發散，因為入口點只能由作業系統或者Bootloader執行，取代返回值的應當是一個exit()呼叫
+    </p>
+    <p>為滿足需求，先寫一個無限迴圈</p>
+    <p>現在執行編譯會看到一個 <strong>連結器</strong> 錯誤</p>
+    <h2>編譯至裸機目標</h2>
+    <p>Rust在預設情況下會編譯為適合主機系統(host system)的可執行檔</p>
+    <p>
+      但由於我們需要讓程式直接運行在裸機上，因此需要讓Rust知道我們要把程式編譯為裸機目標
+    </p>
+    <p>
+      為了描述不同環境，Rust使用<a
+        href="https://ryochack.hatenablog.com/entry/2017/10/01/163334"
+        >target triple</a
+      >的字串，大概格式為
+    </p>
+    <pre><code>[CPU架構]-供應商-作業系統-ABI
+x86_64-pc-windows-msvc
+</code></pre>
+    <p>
+      一個裸機環境的例子是<code>x86_64-unknown-none</code>
+      其描述了一個<code>x86_64</code>架構的系統
+    </p>
+    <p>要編譯此目標，首先新增其至rustup</p>
+    <p><code>rustup target add x86_64-unknown-none</code></p>
+    <p>
+      在編譯時傳入<code>--target</code>參數交叉編譯目標系統的執行檔，由於目標並沒有作業系統，連結器不會嘗試連結C執行時系統，也就沒有連結器錯誤
+    </p>
+    <p><code>cargo build --target x86_64-unknown-none</code></p>
+    <h2>總結</h2>
+    <p>一個最小的在裸機上執行的Rust二進制檔有如下內容</p>
+    <pre><code class="language-rust">#![no_std]
+#![no_main]
+
+use core::panic::PanicInfo;
+
+#[no_mangle]
+pub extern "C" fn _start() -&gt; ! {
+    // 連結器預設會尋找 `_start` 函式名稱
+    // 因此這個函式就是入口點
+    loop {}
+}
+
+#[panic_handler]
+fn panic(_info: &amp;PanicInfo) -&gt; ! {
+    loop {}
+}
+</code></pre>
+    <p><code>Cargo.toml</code></p>
+    <pre><code class="language-toml">[package]
+name = "crate_name"
+version = "1.0.0"
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+</code></pre>
+    <p>建構時需要指定目標</p>
+    <pre><code>cargo build --target x86_64-unknown-none
+</code></pre>
+    <hr />
+    <p>
+      此文章採用<a
+        href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
+        target="_blank"
+        rel="license noopener noreferrer"
+        style="display: inline-block"
+        >CC BY 4.0</a
+      >協議共享
+    </p>
+    <p>於 2024-10-01</p>
+  </body>
+</html>
