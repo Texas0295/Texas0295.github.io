@@ -47,5 +47,12 @@
 <pubDate>Sat, 28 Sep 2024 13:51:10 GMT</pubDate>
 <description>作為網站的管理者，出於人道主義讓晚上看網站的用戶不至於被閃瞎眼睛是很有必要的，因此需要讓網站有亮(Light)和暗(Dark)兩種主題</description>
 </item>
+<item>
+<title>在裸機上執行的Rust二進制檔</title>
+<link>https://texas-0295.xyz/pages/articles/20241001172358.html</link>
+<guid>https://texas-0295.xyz/pages/articles/20241001172358.html</guid>
+<pubDate>Tue, 01 Oct 2024 17:23:58 GMT</pubDate>
+<description>要編寫作業系統核心，必須在去除對任何作業系統的抽象或任何特定硬體的依賴的情形下讓程式獨立運行在裸機(bare-metal)上</description>
+</item>
 </channel>
 </rss>
