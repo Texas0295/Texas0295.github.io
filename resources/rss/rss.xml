@@ -54,5 +54,18 @@
 <pubDate>Tue, 01 Oct 2024 17:23:58 GMT</pubDate>
 <description>要編寫作業系統核心，必須在去除對任何作業系統的抽象或任何特定硬體的依賴的情形下讓程式獨立運行在裸機(bare-metal)上</description>
 </item>
+<item>
+<title>[Record] 配置一個擁有除錯功能的Nvim #1</title>
+<link>https://texas-0295.xyz/pages/articles/20241006192218.html</link>
+<guid>https://texas-0295.xyz/pages/articles/20241006192218.html</guid>
+<pubDate>Sun, 06 Oct 2024 19:22:18 GMT</pubDate>
+<description>電腦性能比較貧瘠，在帶一些大型IDE（甚至還要跑大型程式）的時候風扇轉的太勤了，幾乎要響一整天，只有關掉所有生產工具打開一個社交軟體和Chrome的時候才能消停一些
+
+於是最近把目光放到了終端文字編輯程式上，以vim為首的一眾終端文字編輯程式佔用小巧，裝上插件後也能具備一些IDE常用的功能 。能在滿足日常項目需求的同時讓風扇消停一會，運行時也不會和程式搶佔用
+
+聽說熟練的使用者可以完全丟掉鼠標專注於鍵盤上，編碼效率是提升的
+
+於是經過一些摸索，最終形成了一個初步的配置檔</description>
+</item>
 </channel>
 </rss>
