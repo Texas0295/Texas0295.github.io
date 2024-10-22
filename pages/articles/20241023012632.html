@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>[Record] 配置一個擁有除錯功能的Nvim #2 - Texas0295's blog</title>
+    <meta name="description" content="Texas0295的個人博客" />
+    <meta http-equiv="content-language" content="zh-hant" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta theme-color="#000000" />
+    <meta name="renderer" content="webkit" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="/resources/css/article.css?v=1.0" />
+    <script src="/resources/js/darkmode.js" defer></script>
+  </head>
+  <body>
+  <header><button id="theme-switch"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z" /></svg> <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z" /></svg></button></header>
+    <div class="navigation-bar">
+      <a href="/"><img src="/resources/img/site/info-img.jpg" class="logo" /></a>
+      <nav class="menu">
+        <a href="/">首頁</a>
+        <a href="/pages/articles.html">文章</a>
+        <a href="/pages/otherlinks.html">外鏈</a>
+        <a href="/pages/about.html">關於</a>
+      </nav>
+    </div><h1>[Record] 配置一個擁有除錯功能的Nvim #2</h1>
+<h2>懶人包（最小化）</h2>
+<ul>
+<li>
+<p><code>hrsh7th/nvim-cmp</code> 自動補全</p>
+</li>
+<li>
+<p><code>nvim-treesitter/nvim-treesitter</code> 語法高亮</p>
+</li>
+<li>
+<p><code>neovim/nvim-lspconfig</code> LSP(Language Server Protocol)支援</p>
+</li>
+<li>
+<p><code>williamboman/mason.nvim</code> 包管理器(LSP,Formatter,etc.)</p>
+</li>
+<li>
+<p><code>mfussenegger/nvim-dap</code> DAP(Debugger Adapter Protocol)支援</p>
+</li>
+<li>
+<p><code>rcarriga/nvim-dap-ui</code> 除錯介面</p>
+</li>
+<li>
+<p><code>nvim-tree/nvim-tree.lua</code> 檔案總管</p>
+</li>
+<li>
+<p><code>akinsho/toggleterm.nvim</code> 內建終端分割</p>
+</li>
+<li>
+<p><code>akinsho/bufferline.nvim</code> 標籤欄</p>
+</li>
+</ul>
+<h2>推薦項</h2>
+<ul>
+<li><code>nvim-telescope/telescope.nvim</code> 內建grep</li>
+</ul>
+<h2>配置檔</h2>
+<p>配置檔都基於<code>Lazy</code>管理器格式</p>
+<h3>hrsh7th/nvim-cmp</h3>
+<p>nvim-cmp 是一個補全插件，會在用戶輸入時挑出支援的自動補全選單</p>
+<p>插件本身僅起到一個框架作用，具體的內容依賴於各來源的配置</p>
+<p>nvim-cmp.lua</p>
+<pre><code class="language-lua">return {
+    "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
+    dependencies = {
+        "hrsh7th/cmp-buffer", -- source for text in buffer
+        "hrsh7th/cmp-path", -- source for file system paths
+        "L3MON4D3/LuaSnip", -- snippet engine
+        "saadparwaiz1/cmp_luasnip", -- autocompletion
+        "rafamadriz/friendly-snippets", -- snippets
+    },
+    config = function()
+        local cmp = require("cmp")
+        local luasnip = require("luasnip")
+        -- loads vscode style snippets from installed plugins 
+        require("luasnip.loaders.from_vscode").lazy_load()
+
+        cmp.setup({
+            completion = {
+                completeopt="menu,menuone,preview,noselect",
+            },
+            snippet = {
+                expand = function(args)
+                    luasnip.lsp_expand(args.body)
+                end
+            },
+            mapping = cmp.mapping.preset.insert({
+                ["&lt;Tab&gt;"] = cmp.mapping.select_next_item(),-- traditional (or tab style)
+                ["&lt;up&gt;"] = cmp.mapping.select_prev_item(), -- arrow style
+                ["&lt;down&gt;"] = cmp.mapping.select_next_item(),
+                ["&lt;C-k&gt;"] = cmp.mapping.select_prev_item(),-- vim style
+                ["&lt;C-j&gt;"] = cmp.mapping.select_next_item(),
+                ["&lt;C-up&gt;"] = cmp.mapping.scroll_docs(-4),
+                ["&lt;C-down&gt;"] = cmp.mapping.scroll_docs(4),
+                ["&lt;C-b&gt;"] = cmp.mapping.scroll_docs(-4),
+                ["&lt;C-f&gt;"] = cmp.mapping.scroll_docs(4),
+                ["&lt;C-Space&gt;"] = cmp.mapping.complete(),
+                ["&lt;C-e&gt;"] = cmp.mapping.abort(),
+                ["&lt;CR&gt;"] = cmp.mapping.confirm({ select = false }),
+            }),
+            -- sources of autocompletion
+            sources = cmp.config.sources({
+                { name = "nvim_lsp" },
+                { name = "luasnip" },
+                { name = "buffer" },
+                { name = "path" },
+            }),
+        })
+    end,
+}
+</code></pre>
+<h3>nvim-treesitter/nvim-treesitter</h3>
+<p>語法高亮插件</p>
+<p>nvim-treesitter.lua</p>
+<pre><code class="language-lua">return {
+    "nvim-treesitter/nvim-treesitter",
+    run = ":TSUpdate",
+    config = function()
+        require('nvim-treesitter.configs').setup({
+            ensure_installed = { "lua", "rust", "python", "javascript" }, -- as you like
+            highlight = {
+                enable = true,
+                additional_vim_regex_highlighting = false,
+            },
+        })
+    end,
+}
+</code></pre>
+<h3>nvim-tree/nvim-tree.lua</h3>
+<p>檔案總管插件，可以在Vim內部進行檔案的增刪改而不用離開Vim</p>
+<p>nvim-tree.lua</p>
+<pre><code class="language-lua">return {
+    "nvim-tree/nvim-tree.lua",
+    config = function()
+        require('nvim-tree').setup({
+            sort = {
+                sorter = "case_sensitive",
+            },
+            view = {
+                width = 30,
+            },
+            renderer = {
+                group_empty = true,
+            },
+            filters = {
+                dotfiles = true,
+            },
+        })
+    end,
+}
+</code></pre>
+<h3>akinsho/toggleterm.nvim</h3>
+<p>內置終端支援，在不離開Vim的情況下進行終端操作</p>
+<p>toggleterm.lua</p>
+<pre><code class="language-lua">return{
+    "akinsho/toggleterm.nvim",
+    config = function()
+        require("toggleterm").setup({
+            size = 8,
+            open_mapping = [[&lt;c-t&gt;]],
+            direction = "horizontal",
+            shell = "pwsh",
+            dir = vim.fn.expand("%:p:h"),
+        })
+    end,
+}
+</code></pre>
+<h3>akinsho/bufferline.nvim</h3>
+<p>標籤欄，實現順暢的多檔案切換</p>
+<p>bufferline.lua</p>
+<pre><code class="language-lua">return {
+    "akinsho/bufferline.nvim",
+    requires = "nvim-tree/nvim-web-devicons",
+    config = function()
+        require("bufferline").setup({
+            options = {
+                numbers = "ordinal",
+                close_command = "bdelete! %d",
+                right_mouse_command = "bdelete! %d",
+                indicator_icon = '▎',
+                buffer_close_icon = '×',
+                modified_icon = '+',
+                offsets = {{ filetype = "NvimTree", text = "エクスプローラー", text_align = "center", separator = true }}, -- title for NvimTree's buffer
+                color_icons = true,
+            },
+        })
+
+        -- keymap setup
+        local keymap = vim.keymap
+        keymap.set("n", "&lt;TAB&gt;", "&lt;cmd&gt;BufferLineCycleNext&lt;CR&gt;", {desc = "Cycle buffers"})
+        keymap.set("n", "&lt;leader&gt;h", "&lt;cmd&gt;BufferLineCloseLeft&lt;CR&gt;", {desc = "Close left buffer"})
+        keymap.set("n", "&lt;leader&gt;l", "&lt;cmd&gt;BufferLineCloseRight&lt;CR&gt;", {desc = "Close reignt buffer"})
+        keymap.set("n", "&lt;leader&gt;1", "&lt;cmd&gt;BufferLineGoToBuffer 1&lt;CR&gt;",{desc = "Go to specific buffer"})
+        keymap.set("n", "&lt;leader&gt;2", "&lt;cmd&gt;BufferLineGoToBuffer 2&lt;CR&gt;",{desc = "Go to specific buffer"})
+        keymap.set("n", "&lt;leader&gt;3", "&lt;cmd&gt;BufferLineGoToBuffer 3&lt;CR&gt;",{desc = "Go to specific buffer"})
+        keymap.set("n", "&lt;leader&gt;4", "&lt;cmd&gt;BufferLineGoToBuffer 4&lt;CR&gt;",{desc = "Go to specific buffer"})
+        keymap.set("n", "&lt;leader&gt;5", "&lt;cmd&gt;BufferLineGoToBuffer 5&lt;CR&gt;",{desc = "Go to specific buffer"})
+        keymap.set("n", "&lt;leader&gt;6", "&lt;cmd&gt;BufferLineGoToBuffer 6&lt;CR&gt;",{desc = "Go to specific buffer"})
+        keymap.set("n", "&lt;leader&gt;7", "&lt;cmd&gt;BufferLineGoToBuffer 7&lt;CR&gt;",{desc = "Go to specific buffer"})
+        keymap.set("n", "&lt;leader&gt;8", "&lt;cmd&gt;BufferLineGoToBuffer 8&lt;CR&gt;",{desc = "Go to specific buffer"})
+        keymap.set("n", "&lt;leader&gt;9", "&lt;cmd&gt;BufferLineGoToBuffer 9&lt;CR&gt;",{desc = "Go to specific buffer"})
+
+    end,
+}
+</code></pre>
+<h3>LSP</h3>
+<p>透過LSP的抽象層得到各種語言的語義解析，錯誤判定以及自動補全</p>
+<h4>neovim/nvim-lspconfig</h4>
+<p>核心檔案</p>
+<p>lua需要做配置設定把vim設定為一個全局變數，否則會提示當前上下文中沒有vim這個變數</p>
+<p>lspconfig.lua</p>
+<pre><code class="language-lua">return {
+  "neovim/nvim-lspconfig",
+  event = { "BufReadPre", "BufNewFile" },
+  dependencies = {
+    "hrsh7th/cmp-nvim-lsp",
+    { "antosha417/nvim-lsp-file-operations", config = true },
+    { "folke/neodev.nvim", opts = {} },
+  },
+  config = function()
+    local lspconfig = require("lspconfig")
+
+    local mason_lspconfig = require("mason-lspconfig")
+
+    local cmp_nvim_lsp = require("cmp_nvim_lsp")
+
+    local keymap = vim.keymap
+
+    vim.api.nvim_create_autocmd("LspAttach", {
+      group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+      callback = function(ev)
+        local opts = { buffer = ev.buf, silent = true }
+
+        opts.desc = "Show LSP references"
+        keymap.set("n", "gR", "&lt;cmd&gt;Telescope lsp_references&lt;CR&gt;", opts) -- show definition, references
+
+        opts.desc = "Go to declaration"
+        keymap.set("n", "gD", vim.lsp.buf.declaration, opts) -- go to declaration
+
+        opts.desc = "Show LSP definitions"
+        keymap.set("n", "gd", "&lt;cmd&gt;Telescope lsp_definitions&lt;CR&gt;", opts) -- show lsp definitions
+
+        opts.desc = "Show LSP implementations"
+        keymap.set("n", "gi", "&lt;cmd&gt;Telescope lsp_implementations&lt;CR&gt;", opts) -- show lsp implementations
+
+        opts.desc = "Show LSP type definitions"
+        keymap.set("n", "gt", "&lt;cmd&gt;Telescope lsp_type_definitions&lt;CR&gt;", opts) -- show lsp type definitions
+
+        opts.desc = "See available code actions"
+        keymap.set({ "n", "v" }, "&lt;leader&gt;ca", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
+
+        opts.desc = "Smart rename"
+        keymap.set("n", "&lt;leader&gt;rn", vim.lsp.buf.rename, opts) -- smart rename
+
+        opts.desc = "Show buffer diagnostics"
+        keymap.set("n", "&lt;leader&gt;D", "&lt;cmd&gt;Telescope diagnostics bufnr=0&lt;CR&gt;", opts) -- show  diagnostics for file
+
+        opts.desc = "Go to previous diagnostic"
+        keymap.set("n", "[d", vim.diagnostic.goto_prev, opts) -- jump to previous diagnostic in buffer
+
+        opts.desc = "Go to next diagnostic"
+        keymap.set("n", "]d", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
+
+        opts.desc = "Show documentation for what is under cursor"
+        keymap.set("n", "K", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
+
+        opts.desc = "Show diagnostic in a line popup"
+        keymap.set("n","&lt;leader&gt;e", vim.diagnostic.open_float, opts)
+
+        opts.desc = "Restart LSP"
+        keymap.set("n", "&lt;leader&gt;rs", ":LspRestart&lt;CR&gt;", opts) -- mapping to restart lsp if necessary
+      end,
+    })
+    vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+        vim.lsp.diagnostic.on_publish_diagnostics,{
+            virtual_text = false,
+            signs = true,
+            update_in_insert = true,
+            under_line = true,
+        }
+    )
+    local capabilities = cmp_nvim_lsp.default_capabilities()
+
+    local signs = { Error = "X", Warn = "!", Hint = "-&gt;", Info = "i" }
+    for type, icon in pairs(signs) do
+      local hl = "DiagnosticSign" .. type
+      vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+    end
+
+    mason_lspconfig.setup_handlers({
+      function(server_name)
+        lspconfig[server_name].setup({
+          capabilities = capabilities,
+        }) -- auto setup (or defalut setup) for entire server
+      end,
+
+      -- PERSONALLY, AS YOU LIKE
+      ["svelte"] = function()
+        lspconfig["svelte"].setup({
+          capabilities = capabilities,
+          on_attach = function(client, bufnr)
+            vim.api.nvim_create_autocmd("BufWritePost", {
+              pattern = { "*.js", "*.ts" },
+              callback = function(ctx)
+                client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
+              end,
+            })
+          end,
+        })
+      end,
+      ["graphql"] = function()
+        lspconfig["graphql"].setup({
+          capabilities = capabilities,
+          filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
+        })
+      end,
+      ["emmet_ls"] = function()
+        lspconfig["emmet_ls"].setup({
+          capabilities = capabilities,
+          filetypes = { "html", "typescriptreact", "javascriptreact", "css", "sass", "scss", "less", "svelte" },
+        })
+      end,
+      ["lua_ls"] = function()
+        lspconfig["lua_ls"].setup({
+          capabilities = capabilities,
+          settings = {
+            Lua = {
+              diagnostics = {
+                globals = { "vim" },
+                disable = { "missing-fields" },
+              },
+              completion = {
+                callSnippet = "Replace",
+              },
+            },
+          },
+        })
+      end,
+    })
+  end,
+}
+</code></pre>
+<h4>williamboman/mason.nvim</h4>
+<p>Mason是一個外部工具（例如LSP,DAP,Formatter之類）的管理器</p>
+<p>mason.lua</p>
+<pre><code class="language-lua">return {
+    {
+        "williamboman/mason.nvim",
+        event = { "VeryLazy" },
+        lazy = true,
+        config = function()
+        local mason = require("mason")
+            mason.setup({
+                ui = {
+                    icon = {
+                        package_installed = "✓",
+                        package_pending = "➜",
+                        package_uninstalled = "✗",
+                    },
+                },
+            })
+        end
+    },
+    {
+    "williamboman/mason-lspconfig.nvim",
+    dependencies = {
+        "williamboman/mason.nvim"
+    },
+    config = function()
+    local mason_lspconfig = require("mason-lspconfig")
+        mason_lspconfig.setup({
+            lazy = true,
+            ensure_installed = { -- as you like
+                "html",
+                "cssls",
+                "tailwindcss",
+                "svelte",
+                "lua_ls",
+                "graphql",
+                "emmet_ls",
+                "prismals",
+                "pyright",
+            },
+            automatic_installation = true,
+         })
+     end,
+    },
+    {
+        "WhoIsSethDaniel/mason-tool-installer.nvim",
+        config = function()
+            local mason_tool_installer = require("mason-tool-installer")
+            mason_tool_installer.setup({
+                lazy = true,
+                ensure_installed = { -- as you like
+                    "prettier", -- prettier formatter
+                    "stylua", -- lua formatter
+                    "isort", -- python formatter
+                    "black", -- python formatter
+                    "pylint",
+                    "eslint_d",
+                },
+            })
+        end
+    }
+}
+</code></pre>
+<h3>DAP</h3>
+<p>微軟領頭的DAP讓Debugger有一個統一的通訊協議，讓開發人員可以無成本的使用不同的除錯工具除錯不同語言的程式</p>
+<h4>mfussenegger/nvim-dap</h4>
+<p>核心檔</p>
+<pre><code class="language-lua">return {
+    "mfussenegger/nvim-dap",
+    config = function()
+        local dap = require("dap")
+        dap.set_log_level('DEBUG') -- optional, you will get more information when debugger not working as well
+        dap.adapters.codelldb = {
+            type = 'server',
+            port = "${port}",
+            executable = {
+            command = 'own\\paths\\to\\extension\\adapter\\codelldb.exe',
+            args = {"--port", "${port}"},
+            detached = false, -- [OS SPECIFIC] windows
+            }
+        }
+
+        dap.adapters.cppdbg = {
+            id = 'cppdbg',
+            type = 'executable',
+            command = 'own\\paths\\to\\extension\\debugAdapters\\bin\\OpenDebugAD7.exe',
+            options = {
+                detached = false -- [OS SPECIFIC] windows
+            }
+        }
+
+        -- keymap
+        local keymap = vim.keymap
+        keymap.set("n","&lt;leader&gt;b","&lt;cmd&gt;DapToggleBreakpoint&lt;CR&gt;",{desc="Toggle breakpoint"})
+        keymap.set("n","'t","&lt;cmd&gt;DapTerminate&lt;CR&gt;",{desc="Stop debugging"})
+        keymap.set("n","&lt;F2&gt;","&lt;cmd&gt;DapContinue&lt;CR&gt;",{desc="Start debugging"})
+        keymap.set("n","&lt;F7&gt;","&lt;cmd&gt;DapStepOver&lt;CR&gt;",{desc="Step over"})
+        keymap.set("n","&lt;F8&gt;","&lt;cmd&gt;DapStepInto&lt;CR&gt;",{desc="Step into"})
+        keymap.set("n","&lt;F4&gt;","&lt;cmd&gt;DapStepOut&lt;CR&gt;",{desc="Step out"})
+    end
+}
+</code></pre>
+<p>特定語言的除錯配置檔可以做成一個獨立檔案</p>
+<p>c-dap.lua</p>
+<pre><code class="language-lua">local dap = require("dap")
+dap.configurations.c = {
+  {
+    name = "Launch file",
+    type = "cppdbg",
+    request = "launch",
+    program = function()
+      return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+    end,
+    cwd = '${workspaceFolder}',
+    stopAtEntry = true,
+  }
+}
+
+dap.configurations.cpp = dap.configurations.c -- cpp share c's config
+</code></pre>
+<p>關鍵在<code>dap.configurations.&lt;language&gt;</code>，這一塊直接放到dap.lua內也可以</p>
+<h4>rcarriga/nvim-dap-ui</h4>
+<p>提供除錯介面</p>
+<pre><code class="language-lua">return{
+    "rcarriga/nvim-dap-ui",
+    dependencies = {
+        "mfussenegger/nvim-dap",
+        "nvim-neotest/nvim-nio"
+    },
+    config = function()
+        local dap, dapui = require("dap"), require("dapui")
+        local nvim_tree = require("nvim-tree.api").tree
+        dapui.setup()
+
+        -- when debugging, close NvimTree, when exited, reopen it
+        dap.listeners.before.attach.dapui_config = function()
+            nvim_tree.close()
+            dapui.open()
+        end
+        dap.listeners.before.launch.dapui_config = function()
+            nvim_tree.close()
+            dapui.open()
+        end
+        dap.listeners.before.event_terminated.dapui_config = function()
+            dapui.close()
+            nvim_tree.open()
+        end
+        dap.listeners.before.event_exited.dapui_config = function()
+            dapui.close()
+            nvim_tree.open()
+        end
+
+        require("neodev").setup({
+            library = {
+                plugins = {
+                    "nvim-dap-ui"
+                },
+                types = true,
+            }
+        })
+    end
+}
+</code></pre>
+<h3>可選</h3>
+<h4>nvim-telescope/telescope.nvim</h4>
+<p>查找器，支援檔案，檔案內字串的模糊查詢</p>
+<p>telescope.lua</p>
+<pre><code class="language-lua">return{
+    "nvim-telescope/telescope.nvim",
+    branch = "0.1.x",
+    dependencies = {
+        "nvim-lua/plenary.nvim",
+        {
+            "nvim-telescope/telescope-fzf-native.nvim",
+            build="make" -- check out repo's document to replace command (e.g.: Cmake for win)
+        },
+        "nvim-tree/nvim-web-devicons",
+    },
+    config = function()
+        local telescope = require("telescope")
+        local actions = require("telescope.actions")
+        telescope.setup({
+            defaults = {
+                mappings = {
+                    i = {
+                        ["&lt;C-k&gt;"] = actions.move_selection_previous,
+                        ["&lt;C-j&gt;"] = actions.move_selection_next,
+                        ["&lt;C-q&gt;"] = actions.send_selected_to_qflist + actions.open_qflist,
+                    }
+                }
+            }
+        })
+        telescope.load_extension("fzf");
+
+        -- keymaps
+        local keymap = vim.keymap
+        keymap.set("n","&lt;leader&gt;ff","&lt;cmd&gt;Telescope find_files&lt;cr&gt;",{ desc = "Fuzzy find files in cwd"})
+        keymap.set("n","&lt;leader&gt;fr","&lt;cmd&gt;Telescope oldfiles&lt;cr&gt;",{ desc = "Fuzzy find recent files"})
+        keymap.set("n","&lt;leader&gt;fs","&lt;cmd&gt;Telescope live_grep&lt;cr&gt;",{ desc = "Find string in cwd"})
+        keymap.set("n","&lt;leader&gt;fc","&lt;cmd&gt;Telescope grep_string&lt;cr&gt;",{ desc = "Find string under cursor in cwd"})
+    end
+}
+</code></pre>
+<hr />
+<p>此文章採用<a href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"target="_blank"rel="license noopener noreferrer"style="display: inline-block">CC BY 4.0</a>協議共享</p>
+<p>於 2024-10-23</p>
+</body>
+</html>
