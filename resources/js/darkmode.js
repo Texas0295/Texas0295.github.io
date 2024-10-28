@@ -30,3 +30,5 @@ darkModeToggle.addEventListener("click", () => {
     darkmode = localStorage.getItem("darkmode");
     darkmode !== "active" ? enableDarkMode() : disableDarkMode();
 });
+
+hljs.highlightAll();
