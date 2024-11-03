@@ -96,8 +96,6 @@ code {
     font-size: 105%;
 }
 
-
-
 pre {
     position: relative;
     line-height: 1.4;
@@ -110,6 +108,14 @@ pre {
 img {
     max-width: 100%;
     height: auto;
+}
+.copy{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: var(--preBackgroundColor);
+    color: var(--textColor);
+   /* more stuff */
 }
 
 @media (prefers-color-scheme: dark) {
