@@ -3,7 +3,7 @@ const darkModeToggle = document.getElementById("theme-switch");
 
 function detectDarkMode() {
     if (darkmode === null) {
-        let userDefaultIsDarkMode = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const userDefaultIsDarkMode = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
         darkmode = userDefaultIsDarkMode ? "active" : "disabled";
         localStorage.setItem("darkmode", darkmode);
     }
