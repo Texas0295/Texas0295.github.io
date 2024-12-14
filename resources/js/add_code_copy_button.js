@@ -1,16 +1,17 @@
 const copyButtonLabel = "Copy Code";
 
 // use a class selector if available
-const  blocks = document.querySelectorAll("pre");
+const  blocks = document.querySelectorAll(".pre_content");
 
 blocks.forEach((block) => {
+  const preElement = block.querySelector("pre");
   // only add button if browser supports Clipboard API
   if (navigator.clipboard) {
     const button = document.createElement("button");
     button.classList.add("copy");
 
     button.innerText = copyButtonLabel;
-    block.appendChild(button);
+    block.insertBefore(button,preElement);
 
     button.addEventListener("click", async () => {
       await copyCode(block, button);

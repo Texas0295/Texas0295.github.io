@@ -3,6 +3,7 @@
     --textColor: #111111;
     --base-variant-color: #e0e0e0;
     --preBackgroundColor: #cdd4dd;
+    --preContentBackgroundColor: #cbced3;
 }
 
 .dark{
@@ -10,6 +11,7 @@
     --textColor: #bdbdbd;
     --base-variant-color: #303030;
     --preBackgroundColor: #181f29;
+    --preContentBackgroundColor: #202023;
 }
 
 html{
@@ -110,12 +112,16 @@ img {
     height: auto;
 }
 .copy{
-    position: absolute;
-    top: 5px;
-    right: 5px;
+    position: relative;
+    top: 6px;
+    left: 10px;
     background-color: var(--preBackgroundColor);
     color: var(--textColor);
    /* more stuff */
+}
+
+.pre_content{
+    background-color: var(--preContentBackgroundColor);
 }
 
 @media (prefers-color-scheme: dark) {

@@ -23,6 +23,7 @@
         .then((articles) => {
           const list = document.getElementById("article-list");
 
+          articles.reverse();
           articles.forEach((article) => {
             const listItem = document.createElement("li");
             const link = document.createElement("a");
