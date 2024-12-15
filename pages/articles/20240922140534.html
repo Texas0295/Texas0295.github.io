@@ -73,7 +73,7 @@
       是最基本的參考型別，它們指向一個資料，但自己並不持有所有權
     </p>
     <p>使用 <code>*</code> 來解參考取得它所指向的值</p>
-    <pre><code class="language-rust">fn main() {
+    <div class="pre_content"><pre><code class="language-rust">fn main() {
     let x = 10;
     let y = &amp;x;        // 不可變參考
     let mut z = 20;    
@@ -83,19 +83,19 @@
     *z_ref += 1;            // 解參考可變參考並修改它的值
     println!("*z_ref = {}", *z_ref); // 結果是 21
 }
-</code></pre>
+        </code></pre></div>
     <h3>解構模式中的解參考</h3>
     <p>在模式匹配或變數宣告中，通過解構的方式來解參考：</p>
-    <pre><code class="language-rust">fn main() {
+    <div class="pre_content"><pre><code class="language-rust">fn main() {
     let x = 42;
     let y = &amp;x;
 
     let &amp;z = y; // 解構不可變參考，z 是 u32 型別
     println!("z = {}", z); // z 的值是 42
 }
-</code></pre>
+        </code></pre></div>
     <p>也可以對可變參考進行解構：</p>
-    <pre><code class="language-rust">fn main() {
+    <div class="pre_content"><pre><code class="language-rust">fn main() {
     let mut x = 42;
     let y = &amp;mut x;
 
@@ -103,41 +103,41 @@
     z += 1;
     println!("z = {}", z); // z 的值是 43
 }
-</code></pre>
+        </code></pre></div>
     <h3>Box 型別解參考 (<code>Box&lt;T&gt;</code>)</h3>
     <p><code>Box&lt;T&gt;</code> 是一個智能指針，用來在堆上分配資料</p>
     <p>解參考 <code>Box</code> 後可以取得其所指向的值：</p>
-    <pre><code class="language-rust">fn main() {
+    <div class="pre_content"><pre><code class="language-rust">fn main() {
     let b = Box::new(5); // 在堆上分配一個值 5
     println!("b = {}", *b); // 解參考 Box，結果是 5
 }
-</code></pre>
+        </code></pre></div>
     <h3>Rc 型別解參考 (<code>Rc&lt;T&gt;</code>)</h3>
     <p>
       <code>Rc&lt;T&gt;</code>
       是參考計數智能指針，適用於單線程環境下的多重所有權
     </p>
     <p>可以像解參考普通參考一樣解參考 <code>Rc</code>：</p>
-    <pre><code class="language-rust">use std::rc::Rc;
+    <div class="pre_content"><pre><code class="language-rust">use std::rc::Rc;
 
 fn main() {
     let rc = Rc::new(10); // Rc 擁有值 10
     println!("rc = {}", *rc); // 解參考 Rc，結果是 10
 }
-</code></pre>
+        </code></pre></div>
     <h3>Arc 型別解參考 (<code>Arc&lt;T&gt;</code>)</h3>
     <p>
       <code>Arc&lt;T&gt;</code> 是適用於多線程環境的參考計數智能指針，與
       <code>Rc&lt;T&gt;</code> 類似，但可以在多線程間共享
     </p>
     <p>解參考方式相同：</p>
-    <pre><code class="language-rust">use std::sync::Arc;
+    <div class="pre_content"><pre><code class="language-rust">use std::sync::Arc;
 
 fn main() {
     let arc = Arc::new(10);
     println!("arc = {}", *arc); // 解參考 Arc，結果是 10
 }
-</code></pre>
+        </code></pre></div>
     <h3>指針型別解參考 (<code>*const T</code> 和 <code>*mut T</code>)</h3>
     <p>
       原生指針（<code>*const T</code> 和
@@ -145,7 +145,7 @@ fn main() {
       <code>unsafe</code> 區塊
     </p>
     <p>透過 <code>*</code> 操作符可以解參考這些指針：</p>
-    <pre><code class="language-rust">fn main() {
+    <div class="pre_content"><pre><code class="language-rust">fn main() {
     let x = 42;
     let ptr = &amp;x as *const i32; // 不可變指針
     let mut y = 100;
@@ -157,13 +157,13 @@ fn main() {
         println!("mut_ptr = {}", *mut_ptr); // 結果是 101
     }
 }
-</code></pre>
+        </code></pre></div>
     <h3>Deref 和 DerefMut trait</h3>
     <p>
       自定義型別可以透過實作 <code>Deref</code> 和 <code>DerefMut</code> trait
       來支持解參考行為，允許像解參考指標一樣操作自定義型別
     </p>
-    <pre><code class="language-rust">use std::ops::{Deref, DerefMut};
+    <div class="pre_content"><pre><code class="language-rust">use std::ops::{Deref, DerefMut};
 
 struct MyBox&lt;T&gt;(T);
 
@@ -194,7 +194,7 @@ fn main() {
     *x += 1; // 解參考 MyBox 並修改它的值
     println!("x = {}", *x); // 結果是 6
 }
-</code></pre>
+        </code></pre></div>
     <h3>自動解參考（Deref Coercion）</h3>
     <p>
       當 Rust 發現某個型別實作了 <code>Deref</code> 或
@@ -204,7 +204,7 @@ fn main() {
       通常發生在函數傳遞時，可以自動將 <code>&amp;MyBox&lt;T&gt;</code> 轉換為
       <code>&amp;T</code>。
     </p>
-    <pre><code class="language-rust">fn hello(name: &amp;str) {
+    <div class="pre_content"><pre><code class="language-rust">fn hello(name: &amp;str) {
     println!("Hello, {}!", name);
 }
 
@@ -212,18 +212,18 @@ fn main() {
     let m = MyBox::new(String::from("Rust"));
     hello(&amp;m); // 自動將 &amp;MyBox&lt;String&gt; 解參考為 &amp;String，再解參考為 &amp;str
 }
-</code></pre>
+        </code></pre></div>
     <h3>方法調用中的自動解參考（Method Call Deref Coercion）</h3>
     <p>Rust 可以在方法調用中自動解參考</p>
     <p>
       如果某個型別實作了
       <code>Deref</code>，可以直接調用被解參考型別的方法，而不需要手動解參考
     </p>
-    <pre><code class="language-rust">fn main() {
+    <div class="pre_content"><pre><code class="language-rust">fn main() {
     let s = MyBox::new(String::from("Hello"));
     println!("{}", s.len()); // 自動解參考，調用 String 的 len 方法
 }
-</code></pre>
+        </code></pre></div>
     <hr />
     <p>
       此文章採用<a

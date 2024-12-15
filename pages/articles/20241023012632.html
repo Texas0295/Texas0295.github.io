@@ -65,7 +65,7 @@
 <p>nvim-cmp 是一個補全插件，會在用戶輸入時挑出支援的自動補全選單</p>
 <p>插件本身僅起到一個框架作用，具體的內容依賴於各來源的配置</p>
 <p>nvim-cmp.lua</p>
-<pre><code class="language-lua">return {
+<div class="pre_content"><pre><code class="language-lua">return {
     "hrsh7th/nvim-cmp",
     event = "InsertEnter",
     dependencies = {
@@ -114,11 +114,11 @@
         })
     end,
 }
-</code></pre>
+    </code></pre></div>
 <h3>nvim-treesitter/nvim-treesitter</h3>
 <p>語法高亮插件</p>
 <p>nvim-treesitter.lua</p>
-<pre><code class="language-lua">return {
+<div class="pre_content"><pre><code class="language-lua">return {
     "nvim-treesitter/nvim-treesitter",
     run = ":TSUpdate",
     config = function()
@@ -131,11 +131,11 @@
         })
     end,
 }
-</code></pre>
+    </code></pre></div>
 <h3>nvim-tree/nvim-tree.lua</h3>
 <p>檔案總管插件，可以在Vim內部進行檔案的增刪改而不用離開Vim</p>
 <p>nvim-tree.lua</p>
-<pre><code class="language-lua">return {
+<div class="pre_content"><pre><code class="language-lua">return {
     "nvim-tree/nvim-tree.lua",
     config = function()
         require('nvim-tree').setup({
@@ -154,11 +154,11 @@
         })
     end,
 }
-</code></pre>
+    </code></pre></div>
 <h3>akinsho/toggleterm.nvim</h3>
 <p>內置終端支援，在不離開Vim的情況下進行終端操作</p>
 <p>toggleterm.lua</p>
-<pre><code class="language-lua">return{
+<div class="pre_content"><pre><code class="language-lua">return{
     "akinsho/toggleterm.nvim",
     config = function()
         require("toggleterm").setup({
@@ -170,11 +170,11 @@
         })
     end,
 }
-</code></pre>
+    </code></pre></div>
 <h3>akinsho/bufferline.nvim</h3>
 <p>標籤欄，實現順暢的多檔案切換</p>
 <p>bufferline.lua</p>
-<pre><code class="language-lua">return {
+<div class="pre_content"><pre><code class="language-lua">return {
     "akinsho/bufferline.nvim",
     requires = "nvim-tree/nvim-web-devicons",
     config = function()
@@ -208,14 +208,14 @@
 
     end,
 }
-</code></pre>
+    </code></pre></div>
 <h3>LSP</h3>
 <p>透過LSP的抽象層得到各種語言的語義解析，錯誤判定以及自動補全</p>
 <h4>neovim/nvim-lspconfig</h4>
 <p>核心檔案</p>
 <p>lua需要做配置設定把vim設定為一個全局變數，否則會提示當前上下文中沒有vim這個變數</p>
 <p>lspconfig.lua</p>
-<pre><code class="language-lua">return {
+<div class="pre_content"><pre><code class="language-lua">return {
   "neovim/nvim-lspconfig",
   event = { "BufReadPre", "BufNewFile" },
   dependencies = {
@@ -345,11 +345,11 @@
     })
   end,
 }
-</code></pre>
+    </code></pre></div>
 <h4>williamboman/mason.nvim</h4>
 <p>Mason是一個外部工具（例如LSP,DAP,Formatter之類）的管理器</p>
 <p>mason.lua</p>
-<pre><code class="language-lua">return {
+<div class="pre_content"><pre><code class="language-lua">return {
     {
         "williamboman/mason.nvim",
         event = { "VeryLazy" },
@@ -409,12 +409,12 @@
         end
     }
 }
-</code></pre>
+    </code></pre></div>
 <h3>DAP</h3>
 <p>微軟領頭的DAP讓Debugger有一個統一的通訊協議，讓開發人員可以無成本的使用不同的除錯工具除錯不同語言的程式</p>
 <h4>mfussenegger/nvim-dap</h4>
 <p>核心檔</p>
-<pre><code class="language-lua">return {
+<div class="pre_content"><pre><code class="language-lua">return {
     "mfussenegger/nvim-dap",
     config = function()
         local dap = require("dap")
@@ -448,10 +448,10 @@
         keymap.set("n","&lt;F4&gt;","&lt;cmd&gt;DapStepOut&lt;CR&gt;",{desc="Step out"})
     end
 }
-</code></pre>
+    </code></pre></div>
 <p>特定語言的除錯配置檔可以做成一個獨立檔案</p>
 <p>c-dap.lua</p>
-<pre><code class="language-lua">local dap = require("dap")
+<div class="pre_content"><pre><code class="language-lua">local dap = require("dap")
 dap.configurations.c = {
   {
     name = "Launch file",
@@ -466,11 +466,11 @@ dap.configurations.c = {
 }
 
 dap.configurations.cpp = dap.configurations.c -- cpp share c's config
-</code></pre>
+    </code></pre></div>
 <p>關鍵在<code>dap.configurations.&lt;language&gt;</code>，這一塊直接放到dap.lua內也可以</p>
 <h4>rcarriga/nvim-dap-ui</h4>
 <p>提供除錯介面</p>
-<pre><code class="language-lua">return{
+<div class="pre_content"><pre><code class="language-lua">return{
     "rcarriga/nvim-dap-ui",
     dependencies = {
         "mfussenegger/nvim-dap",
@@ -509,12 +509,12 @@ dap.configurations.cpp = dap.configurations.c -- cpp share c's config
         })
     end
 }
-</code></pre>
+    </code></pre></div>
 <h3>可選</h3>
 <h4>nvim-telescope/telescope.nvim</h4>
 <p>查找器，支援檔案，檔案內字串的模糊查詢</p>
 <p>telescope.lua</p>
-<pre><code class="language-lua">return{
+<div class="pre_content"><pre><code class="language-lua">return{
     "nvim-telescope/telescope.nvim",
     branch = "0.1.x",
     dependencies = {
@@ -549,7 +549,7 @@ dap.configurations.cpp = dap.configurations.c -- cpp share c's config
         keymap.set("n","&lt;leader&gt;fc","&lt;cmd&gt;Telescope grep_string&lt;cr&gt;",{ desc = "Find string under cursor in cwd"})
     end
 }
-</code></pre>
+    </code></pre></div>
 <hr />
 <p>此文章採用<a href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"target="_blank"rel="license noopener noreferrer"style="display: inline-block">CC BY 4.0</a>協議共享</p>
 <p>於 2024-10-23</p>

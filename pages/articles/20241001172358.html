@@ -67,12 +67,12 @@
       >
     </p>
     <p>在Rust中，使用<code>#![no_std]</code>屬性來停用標準函式庫</p>
-    <pre><code class="language-rust">#![no_std]
+    <div class="pre_content"><pre><code class="language-rust">#![no_std]
 
 fn main(){
 	println!("Hello World");
 }
-</code></pre>
+</code></pre></div>
     <p>進行<code>cargo build</code>，得到一行報錯資訊</p>
     <p><code>error: cannot find marco "println" in this scope</code></p>
     <p>
@@ -90,13 +90,13 @@ error: language item required, but not found: `eh_personality`
       <code>panic handler</code
       >被定義為發生panic時編譯器需呼叫的函式，標準庫中已經實作了一個，但我們沒有使用標準函式庫，因而要定義自己的handler
     </p>
-    <pre><code class="language-rust">use core::panic::PanicInfo;
+    <div class="pre_content"><pre><code class="language-rust">use core::panic::PanicInfo;
 
 #[panic_handler]
 fn panic(_info: &amp;PanicInfo) -&gt; ! {
 	loop{}
 }
-</code></pre>
+        </code></pre></div>
     <p>目前這個handler什麼事也不做，只進行一個無限迴圈</p>
     <p>
       因為這個函式不會返回，所以是<a
@@ -116,12 +116,12 @@ fn panic(_info: &amp;PanicInfo) -&gt; ! {
       Rust也提供了直接在程式panic時中止的選項以停用回溯標誌訊息的產生，要啟用這個選項的最簡單方式是在
       <code>Cargo.toml</code> 中加入以下選項
     </p>
-    <pre><code class="language-toml">[profile.dev]
+    <div class="pre_content"><pre><code class="language-toml">[profile.dev]
 panic = "abort"
 
 [profile.release]
 panic = "abort"
-</code></pre>
+        </code></pre></div>
     <p>之後編譯器就不會要求<code>eh_personality</code> language item</p>
     <h2>start</h2>
     <p>
@@ -142,7 +142,7 @@ panic = "abort"
     </p>
     <h2>覆寫crt0的入口點</h2>
     <p>使用<code>#![no_main]</code>告訴編譯器不使用默認的呼叫順序</p>
-    <pre><code class="language-rust">#![no_std]
+    <div class="pre_content"><pre><code class="language-rust">#![no_std]
 #![no_main]
 
 use core::panic::PanicInfo;
@@ -151,13 +151,13 @@ use core::panic::PanicInfo;
 fn panic(_info: &amp;PanicInfo) -&gt; !{
 	loop{}
 }
-</code></pre>
+        </code></pre></div>
     <p>然後重寫入口點，定義函式<code>_start</code></p>
-    <pre><code class="language-rust">#[no_mangle]
+    <div class="pre_content"><pre><code class="language-rust">#[no_mangle]
 pub extern "C" fn _start() -&gt; !{
 	loop{}
 }
-</code></pre>
+        </code></pre></div>
     <p>
       使用<code>#[no_mangle]</code>停用<a
         href="https://en.wikipedia.org/wiki/Name_mangling"
@@ -202,7 +202,7 @@ x86_64-pc-windows-msvc
     <p><code>cargo build --target x86_64-unknown-none</code></p>
     <h2>總結</h2>
     <p>一個最小的在裸機上執行的Rust二進制檔有如下內容</p>
-    <pre><code class="language-rust">#![no_std]
+    <div class="pre_content"><pre><code class="language-rust">#![no_std]
 #![no_main]
 
 use core::panic::PanicInfo;
@@ -218,9 +218,9 @@ pub extern "C" fn _start() -&gt; ! {
 fn panic(_info: &amp;PanicInfo) -&gt; ! {
     loop {}
 }
-</code></pre>
+        </code></pre></div >
     <p><code>Cargo.toml</code></p>
-    <pre><code class="language-toml">[package]
+    <div class="pre_content"><pre><code class="language-toml">[package]
 name = "crate_name"
 version = "1.0.0"
 
@@ -229,10 +229,10 @@ panic = "abort"
 
 [profile.release]
 panic = "abort"
-</code></pre>
+        </code></pre></div>
     <p>建構時需要指定目標</p>
-    <pre><code>cargo build --target x86_64-unknown-none
-</code></pre>
+    <div class="pre_content"><pre><code>cargo build --target x86_64-unknown-none
+        </code></pre></div>
     <hr />
     <p>
       此文章採用<a

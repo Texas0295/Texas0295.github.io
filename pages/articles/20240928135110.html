@@ -75,14 +75,14 @@
         >&lt;button&gt;</code
       >
     </p>
-    <pre><code class="language-html">&lt;body&gt;
+          <div class="pre_content"><pre><code class="language-html">&lt;body&gt;
     &lt;header&gt;
         &lt;button id="theme-switch"&gt;
             &lt;!-- 裡面放先前下載的兩個SVG檔案,Ctrl C + V即可--&gt;
         &lt;/button&gt;
     &lt;/header&gt;
 &lt;/body&gt;
-</code></pre>
+              </code></pre></div>
     <p>設定一個id留給css選擇器找這個特定button</p>
     <h2>CSS</h2>
     <h3>主題顏色</h3>
@@ -90,22 +90,22 @@
     <p>
       其中Light是預設，所以我們在<code>:root</code>中用變數設定Light主題用到的顏色
     </p>
-    <pre><code class="language-css">:root{
+    <div class="pre_content"><pre><code class="language-css">:root{
     --backgroundColor: #f4f4f4;
     --base-variant-color: #e0e0e0;
     --textColor: #111111;
 }
-</code></pre>
+        </code></pre></div>
     <p>然後再新增一個<code>.dark</code>選擇器，設定Dark主題用到的顏色</p>
-    <pre><code class="language-css">.dark{
+    <div class="pre_content"><pre><code class="language-css">.dark{
     --backgroundColor: #111111;
     --base-variant-color: #303030;
     --textColor: #bdbdbd;
 }
-</code></pre>
+        </code></pre></div>
     <h3>theme-switch 按鈕</h3>
     <p>先規定切換按鈕的形狀，填充及位置</p>
-    <pre><code class="language-css">#theme-switch {
+    <div class="pre_content"><pre><code class="language-css">#theme-switch {
     border: none;
     width: 40px;
     height: 40px;
@@ -119,11 +119,11 @@
     right: 20px;
     bottom: 20px;   
 }
-</code></pre>
+        </code></pre></div>
     <p>
       然後再設定中間的兩個圖標在不同主題下的顯示，需要注意的是由於選擇SVG標籤是以<code>first-child</code>與<code>last-child</code>為準，因此SVG標籤的位置會影響顯示效果，需要將Darkmode的圖標至於Lightmode的圖標之前
     </p>
-    <pre><code class="language-css">#theme-switch svg {
+    <div class="pre_content"><pre><code class="language-css">#theme-switch svg {
     fill: var(--textColor);
 }
 
@@ -138,18 +138,18 @@
 .dark #theme-switch svg:last-child{
     display: block;
 }
-</code></pre>
+        </code></pre></div>
     <h2>JS</h2>
     <p>真正的切換部分由js負責，首先在HTML檔中引用負責切換darkmode的js</p>
-    <pre><code class="language-html">&lt;head&gt;
+    <div class="pre_content"><pre><code class="language-html">&lt;head&gt;
     &lt;!-- 其餘設定略 --&gt;
     &lt;script src="/path/to/darkmode.js" defer&gt;&lt;/script&gt;
 &lt;/head&gt;
-</code></pre>
+        </code></pre></div>
     <p><code>defer</code>可以讓js在<code>DOMContentLoaded</code>事件之前載進</p>
     <h3>darkmode.js</h3>
     <p>原始碼如下</p>
-    <pre><code class="language-js">let darkmode = localStorage.getItem("darkmode");
+    <div class="pre_content"><pre><code class="language-js">let darkmode = localStorage.getItem("darkmode");
 const darkModeToggle = document.getElementById("theme-switch");
 
 function detectDarkMode() {
@@ -182,7 +182,7 @@ darkModeToggle.addEventListener("click", () =&gt; {
     darkmode !== "active" ? enableDarkMode() : disableDarkMode();
 });
 
-</code></pre>
+        </code></pre></div>
     <p>變數&amp;常數:</p>
     <ul>
       <li>
