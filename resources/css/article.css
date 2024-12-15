@@ -117,6 +117,7 @@ img {
     left: 10px;
     background-color: var(--preBackgroundColor);
     color: var(--textColor);
+    border-radius: 12px;
    /* more stuff */
 }
 
