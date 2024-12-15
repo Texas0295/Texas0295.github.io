@@ -74,5 +74,12 @@
 <pubDate>Wed, 23 Oct 2024 01:26:32 GMT</pubDate>
 <description>懶人包</description>
 </item>
+<item>
+<title>簡單的複製按鈕</title>
+<link>https://texas0295.top/pages/articles/20241215200122.html</link>
+<guid>https://texas0295.top/pages/articles/20241215200122.html</guid>
+<pubDate>Sun, 15 Dec 2024 20:01:22 GMT</pubDate>
+<description>大部分技術性部落格的程式碼部分一般會附上一個複製按鈕方便訪客輕鬆複製貼上，出於人道主義因而開始實現此功能</description>
+</item>
 </channel>
 </rss>
