@@ -124,6 +124,7 @@ img {
 
 .pre_content{
     background-color: var(--preContentBackgroundColor);
+    color: var(--textColor);
 }
 
 @media (prefers-color-scheme: dark) {
