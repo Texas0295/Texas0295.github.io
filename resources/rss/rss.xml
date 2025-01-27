@@ -2,62 +2,62 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
 <channel>
 <title>Texas0295`s blog</title>
-<link>https://texas-0295.xyz/</link>
+<link>https://texas0295.top/</link>
 <description>人生は意味無し</description>
 <language>zh-TW</language>
 <item>
 <title>ハイエク：隷属への道(Test)</title>
-<link>https://texas-0295.xyz/pages/articles/20240921.html</link>
-<guid>https://texas-0295.xyz/pages/articles/20240921.html</guid>
+<link>https://texas0295.top/pages/articles/20240921.html</link>
+<guid>https://texas0295.top/pages/articles/20240921.html</guid>
 <pubDate>Sun, 22 Sep 2024 00:00:01 GMT</pubDate>
 <description>あいうえおかきくけこさしすせそたちつてと</description>
 </item>
 <item>
 <title>更新此部落格的流程</title>
-<link>https://texas-0295.xyz/pages/articles/20240922103241.html</link>
-<guid>https://texas-0295.xyz/pages/articles/20240922103241.html</guid>
+<link>https://texas0295.top/pages/articles/20240922103241.html</link>
+<guid>https://texas0295.top/pages/articles/20240922103241.html</guid>
 <pubDate>Sun, 22 Sep 2024 10:32:41 GMT</pubDate>
 <description>在做前端這方面沒有什麼知識，打算從基本HTML開始寫一個簡單案例，所以沒有運用Jekyll之類的輔助工具</description>
 </item>
 <item>
 <title>透過CloudFlare將github pages綁定至自訂網域</title>
-<link>https://texas-0295.xyz/pages/articles/20240922103310.html</link>
-<guid>https://texas-0295.xyz/pages/articles/20240922103310.html</guid>
+<link>https://texas0295.top/pages/articles/20240922103310.html</link>
+<guid>https://texas0295.top/pages/articles/20240922103310.html</guid>
 <pubDate>Sun, 22 Sep 2024 10:33:10 GMT</pubDate>
 <description>對於在GitHub上託管的網頁，GitHub會為每個使用者或專案分配一個預設網域。</description>
 </item>
 <item>
 <title>[ノート]動詞の未然形とその使い方</title>
-<link>https://texas-0295.xyz/pages/articles/20240927191426.html</link>
-<guid>https://texas-0295.xyz/pages/articles/20240927191426.html</guid>
+<link>https://texas0295.top/pages/articles/20240927191426.html</link>
+<guid>https://texas0295.top/pages/articles/20240927191426.html</guid>
 <pubDate>Sun, 22 Sep 2024 19:14:26 GMT</pubDate>
 <description>五段動詞は、ア段未然形とオ段未然形があるから、実際の接続によって、語尾を変換する。</description>
 </item>
 <item>
 <title>Rust: 解參考（Dereferencing）</title>
-<link>https://texas-0295.xyz/pages/articles/20240922140534.html</link>
-<guid>https://texas-0295.xyz/pages/articles/20240922140534.html</guid>
+<link>https://texas0295.top/pages/articles/20240922140534.html</link>
+<guid>https://texas0295.top/pages/articles/20240922140534.html</guid>
 <pubDate>Sun, 22 Sep 2024 14:05:34 GMT</pubDate>
 <description>在 Rust 中，解參考（dereferencing）是從一個參考或指針型別中取得其所指向的值的操作</description>
 </item>
 <item>
 <title>DarkMode實現</title>
-<link>https://texas-0295.xyz/pages/articles/20240928135110.html</link>
-<guid>https://texas-0295.xyz/pages/articles/20240928135110.html</guid>
+<link>https://texas0295.top/pages/articles/20240928135110.html</link>
+<guid>https://texas0295.top/pages/articles/20240928135110.html</guid>
 <pubDate>Sat, 28 Sep 2024 13:51:10 GMT</pubDate>
 <description>作為網站的管理者，出於人道主義讓晚上看網站的用戶不至於被閃瞎眼睛是很有必要的，因此需要讓網站有亮(Light)和暗(Dark)兩種主題</description>
 </item>
 <item>
 <title>在裸機上執行的Rust二進制檔</title>
-<link>https://texas-0295.xyz/pages/articles/20241001172358.html</link>
-<guid>https://texas-0295.xyz/pages/articles/20241001172358.html</guid>
+<link>https://texas0295.top/pages/articles/20241001172358.html</link>
+<guid>https://texas0295.top/pages/articles/20241001172358.html</guid>
 <pubDate>Tue, 01 Oct 2024 17:23:58 GMT</pubDate>
 <description>要編寫作業系統核心，必須在去除對任何作業系統的抽象或任何特定硬體的依賴的情形下讓程式獨立運行在裸機(bare-metal)上</description>
 </item>
 <item>
 <title>[Record] 配置一個擁有除錯功能的Nvim #1</title>
-<link>https://texas-0295.xyz/pages/articles/20241006192218.html</link>
-<guid>https://texas-0295.xyz/pages/articles/20241006192218.html</guid>
+<link>https://texas0295.top/pages/articles/20241006192218.html</link>
+<guid>https://texas0295.top/pages/articles/20241006192218.html</guid>
 <pubDate>Sun, 06 Oct 2024 19:22:18 GMT</pubDate>
 <description>電腦性能比較貧瘠，在帶一些大型IDE（甚至還要跑大型程式）的時候風扇轉的太勤了，幾乎要響一整天，只有關掉所有生產工具打開一個社交軟體和Chrome的時候才能消停一些
 
@@ -69,8 +69,8 @@
 </item>
 <item>
 <title>[Record] 配置一個擁有除錯功能的Nvim #2</title>
-<link>https://texas-0295.xyz/pages/articles/20241023012632.html</link>
-<guid>https://texas-0295.xyz/pages/articles/20241023012632.html</guid>
+<link>https://texas0295.top/pages/articles/20241023012632.html</link>
+<guid>https://texas0295.top/pages/articles/20241023012632.html</guid>
 <pubDate>Wed, 23 Oct 2024 01:26:32 GMT</pubDate>
 <description>懶人包</description>
 </item>
@@ -80,6 +80,13 @@
 <guid>https://texas0295.top/pages/articles/20241215200122.html</guid>
 <pubDate>Sun, 15 Dec 2024 20:01:22 GMT</pubDate>
 <description>大部分技術性部落格的程式碼部分一般會附上一個複製按鈕方便訪客輕鬆複製貼上，出於人道主義因而開始實現此功能</description>
+</item>
+<item>
+<title>Raspbarry Pi Zero 簡易安裝指南</title>
+<link>https://texas0295.top/pages/articles/20250127141643.html</link>
+<guid>https://texas0295.top/pages/articles/20250127141643.html</guid>
+<pubDate>Mon, 27 Jan 2025 14:16:43 GMT</pubDate>
+<description>最近入手了一塊Raspbarry Pi Zero，記錄一遍安裝過程供參考用</description>
 </item>
 </channel>
 </rss>
