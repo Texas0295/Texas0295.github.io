@@ -18,6 +18,10 @@ html{
     font-family: 'Cascadia Code', Consolas, Helvetica, 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
 }
 
+video {
+    max-width: 100%;
+}
+
 body {
     color: var(--textColor);
     background-color: var(--backgroundColor);
