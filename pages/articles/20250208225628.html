@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>在Windows上設定Raspberry Pi Pico C 開發環境 - Texas0295's blog</title>
+    <meta name="description" content="Texas0295的個人博客" />
+    <meta http-equiv="content-language" content="zh-hant" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta theme-color="#000000" />
+    <meta name="renderer" content="webkit" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="/resources/css/article.css?v=1.0" />
+    <script src="/resources/js/highlight.min.js"></script>
+    <script src="/resources/js/add_code_copy_button.js" defer></script>
+  </head>
+  <body>
+  <header><button id="theme-switch"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z" /></svg> <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z" /></svg></button></header>
+    <div class="navigation-bar">
+      <a href="/"><img src="/resources/img/site/info-img.jpg" class="logo" /></a>
+      <nav class="menu">
+        <a href="/">首頁</a>
+        <a href="/pages/articles.html">文章</a>
+        <a href="/pages/otherlinks.html">外鏈</a>
+        <a href="/pages/about.html">關於</a>
+      </nav>
+    </div>
+    <script src="/resources/js/darkmode.js"></script><h1>在Windows上設定Raspberry Pi Pico C 開發環境</h1>
+<h2>關於Raspberry Pi Pico</h2>
+<p>Raspberry Pi Pico 是一個單晶片，有Pico和加裝了無線通訊模塊的Pico W</p>
+<p>按住Pico上的BOOTSEL鍵並將其透過USB連接到計算機上，計算機會將其視為普通的USB儲存設備。將程式編譯成<code>.utf2</code>檔案後移到儲存空間，Pico會自動斷開連接並執行其中的程式</p>
+<h2>清單</h2>
+<ul>
+<li>Raspberry Pico SDK [<a href="https://github.com/raspberrypi/pico-sdk">Github</a>]</li>
+<li>GNU Arm Embedded Toolchain [<a href="https://developer.arm.com/downloads/-/gnu-rm">Download Page</a>]</li>
+<li>Git [<a href="https://git-scm.com/downloads">Download Page</a>]</li>
+<li>CMake [<a href="https://cmake.org/download/">Download Page</a>]</li>
+<li>Make [<a href="https://gnuwin32.sourceforge.net/packages/make.htm">Download Page</a>]</li>
+</ul>
+<h2>正文</h2>
+<p>安裝CMmake，Make，Git和，GNU Arm Embedded Toolchain</p>
+<p>從Github下載Raspberry Pico SDK：</p>
+<div class="pre_content"><pre><code class="language-txt">git clone https://github.com/raspberrypi/pico-sdk
+</code></pre></div>
+<p>為系統添加以下兩個系統變數：</p>
+<ul>
+<li>PICO_SDK_PATH ： 指向Raspberry Pico SDK的專案資料夾</li>
+<li>PICO_TOOLCHAIN_PATH ： 指向GNU Arm Embedded Toolchain的安裝位置</li>
+</ul>
+<h3>實例</h3>
+<p>以一個簡單的點燈程式為例，在任意位置創建項目資料夾<code>blink</code>。</p>
+<p>在<code>blink</code>下創建<code>CMakeLists.txt</code>:</p>
+<div class="pre_content"><pre><code class="language-cmake">
+cmake_minimum_required(VERSION 3.13)
+include(pico_sdk_import.cmake)
+project(blink)
+pico_sdk_init()
+add_executable(blink
+    blink.c
+)
+target_link_libraries(blink pico_stdlib)
+pico_add_extra_outputs(blink)
+
+</code></pre></div>
+<p>和<code>blink.c</code></p>
+<div class="pre_content"><pre><code class="language-c">#include "pico/stdlib.h"
+
+void pico_led_init(void) {
+#ifdef PICO_DEFAULT_LED_PIN
+    gpio_init(PICO_DEFAULT_LED_PIN);
+    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+#endif
+}
+
+void pico_set_led(bool led_on) {
+#if defined(PICO_DEFAULT_LED_PIN)
+    gpio_put(PICO_DEFAULT_LED_PIN, led_on);
+#endif
+}
+
+int main() {
+    pico_led_init();
+    while (true) {
+        pico_set_led(true);
+        sleep_ms(500);
+        pico_set_led(false);
+        sleep_ms(500);
+    }
+}
+</code></pre></div>
+<p>將<code>pico_sdk_import.cmake</code>(path/to/pico_sdk/external/pico_sdk_import.cmake)移到項目資料夾下</p>
+<p>在項目資料夾下創建<code>build</code>資料夾，在該資料夾內執行<code>cmake -G "Unix Makefiles" ..</code>。等待構建完成後運行<code>make blink</code>，應該能得到<code>blink.uf2</code>的檔案，按照先前介紹的方式將<code>.uf2</code>檔案寫入Pico單晶片。Pico上自帶的LED燈應當能開始按照恆定頻率閃爍。</p>
+<video>
+    <source src="/resources/vedio/20250208225628_v_1.mp4"/>
+</video>
+<hr />
+<p>此文章採用<a href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"target="_blank"rel="license noopener noreferrer"style="display: inline-block">CC BY 4.0</a>協議共享</p>
+<p>於 2025-02-08</p>
+</body>
+</html>
