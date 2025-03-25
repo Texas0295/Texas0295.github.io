@@ -12,9 +12,7 @@
 
 
 html{
-    
     font-family: 'Cascadia Code', Consolas, Helvetica, 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
-    
 }
 
 body {
@@ -150,7 +148,6 @@ img {
     display: flex;
     min-height: 150px;
     height: 300px;
-    border-bottom: solid var(--textColor);
 }
 
 .solian-post-attachments{
