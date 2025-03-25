@@ -65,10 +65,10 @@ function render(posts) {
 
         postsContainer.appendChild(postElement);
 
-        const attachmentsElement = document.createElement('div');
-        attachmentsElement.classList.add(postBody.id + '-attachment');
-        const postContent = document.querySelector('.solian-post-content');
-        postContent.appendChild(attachmentsElement);
+//        const attachmentsElement = document.createElement('div');
+//        attachmentsElement.classList.add(postBody.id + '-attachment');
+//        const postContent = document.querySelector('.solian-post-content');
+//        postContent.appendChild(attachmentsElement);
 
         if(postBody.attachments.length > 0){
             try {
