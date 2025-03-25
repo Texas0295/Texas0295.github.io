@@ -146,6 +146,47 @@ img {
     height: auto;
 }
 
+.solian-post{
+    display: flex;
+    min-height: 150px;
+    height: 300px;
+    border-bottom: solid var(--textColor);
+}
+
+.solian-post-attachments{
+    display: flex;
+    height: auto;
+    overflow-x: auto; 
+    -ms-overflow-style:none; 
+    scrollbar-width:none;
+}
+.solian-post-attachments img{
+    height: 150px;
+}
+.solian-post-content{
+    padding-left: 5px;
+    margin: 0 0;
+    height: 300px
+}
+
+.solian-post-content p{
+    margin: 0 0;
+}
+
+.publisher{
+    height: 150px;
+    width: 60px
+}
+
+.publisher img{
+    padding-top: 10px;
+    padding-left: 10px;
+    width: 40px;
+    height: 40px;
+    -webkit-user-drag: none;
+    user-select: none;
+}
+
 #theme-switch {
     border: none;
     width: 40px;
