@@ -18,6 +18,21 @@ async function getPosts() {
   }
 }
 
+async function getAttachmentMeta(requestURL){
+    try {
+        const response = await fetch(requestURL);
+        if(!response.ok){
+            return {type: null};
+        }
+        const data = await response.json();
+        if(data){
+            return {type: data.mimetype};
+        }
+    } catch (error) {
+        console.error("error while getting attachment's meta data:", error);
+    }
+}
+
 function formatUTCtoLocal(utcString) {
   const date = new Date(utcString);
 
@@ -65,11 +80,6 @@ function render(posts) {
 
         postsContainer.appendChild(postElement);
 
-//        const attachmentsElement = document.createElement('div');
-//        attachmentsElement.classList.add(postBody.id + '-attachment');
-//        const postContent = document.querySelector('.solian-post-content');
-//        postContent.appendChild(attachmentsElement);
-
         if(postBody.attachments.length > 0){
             try {
                 renderAttachments(postBody.attachments);
@@ -86,57 +96,33 @@ function render(posts) {
 function renderAttachments(attachments){
     const attachmentsDiv = document.querySelector('.solian-post-attachments');
     attachments.forEach(attachment => {
-        const attachmentUrl = 'https://api.sn.solsynth.dev/cgi/uc/attachments/'+attachment;
         try{
-            renderAttachment(attachmentUrl,attachmentsDiv);
+            renderAttachment(attachment);
         }catch(error){
             console.error('error while processing attachments:', error);
         }
     });
 }
 
-function renderAttachment(attachmentUrl){
-    const divGoingToRender = document.querySelector('.solian-post-attachments');
-    const imgE = document.createElement('img');
-    imgE.src = attachmentUrl;
-    divGoingToRender.appendChild(imgE);
-}
-
-async function renderAttachment_old(attachmentUrl){
-    const result = await getAttachment(attachmentUrl);
+async function renderAttachment(rid){
+    const attachmentQueryURL = 'https://api.sn.solsynth.dev/cgi/uc/attachments/'+rid+"/meta";
+    const attachmentAccessURL = 'https://api.sn.solsynth.dev/cgi/uc/attachments/'+rid;
+    const result = await getAttachmentMeta(attachmentQueryURL);
     console.log(result);
     const divGoingToRender = document.querySelector('.solian-post-attachments');
-        if(result.contentType){
-            if(result.contentType.startsWith("image")){
+        if(result.type){
+            if(result.type.startsWith("image")){
                 const imgE = document.createElement('img');
-                    imgE.src = result.location;
+                    imgE.src = attachmentAccessURL;
                     divGoingToRender.appendChild(imgE);
                 }
-                if(result.contentType.startsWith("video")){
+                if(result.type.startsWith("video")){
                     const videoE = document.createElement('video');
-                    videoE.src = result.location;
+                    videoE.src = attachmentAccessURL;
                     divGoingToRender.appendChild(videoE);
                 }
             }
 
-}
-
-async function getAttachment(reqURL){
-    try{
-        const resp = await fetch(reqURL, {
-            method: 'GET',
-            mode: 'cors',
-        });
-        console.log(resp);
-        console.log(resp.status);
-        console.log(resp.type);
-        const contentType = resp.headers.get('content-type');
-        const location = resp.url;
-        return { contentType: contentType, location: location};
-    }catch (error){
-        console.error('error fetching data:', error);
-        return {contentType: null,location: null};
-    }
 }
 
 async function main() {
