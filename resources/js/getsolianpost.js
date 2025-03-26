@@ -68,7 +68,6 @@ function render(posts) {
         postElement.classList.add('solian-post');
 
         postElement.innerHTML = `
-            <div class="publisher"><img src="/resources/img/site/solian-poster.png"></div>
             <div class="solian-post-content">
             <h2>${l_title}</h2>
             <p>At: ${postBody.created_at}</p>

@@ -170,20 +170,6 @@ img {
     margin: 0 0;
 }
 
-.publisher{
-    height: 150px;
-    width: 60px
-}
-
-.publisher img{
-    padding-top: 3px;
-    padding-left: 2px;
-    width: 40px;
-    height: 40px;
-    -webkit-user-drag: none;
-    user-select: none;
-}
-
 #theme-switch {
     border: none;
     width: 40px;
