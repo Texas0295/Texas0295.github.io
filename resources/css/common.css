@@ -1,203 +1,179 @@
-:root{
-    --backgroundColor: #f4f4f4;
-    --base-variant-color: #e0e0e0;
-    --textColor: #111111;
+:root {
+  --background-color: #f4f4f4;
+  --base-variant-color: #e0e0e0;
+  --text-color: #111111;
+  --link-color: #754ea5;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.dark{
-    --backgroundColor: #111111;
-    --base-variant-color: #303030;
-    --textColor: #bdbdbd;
+[data-theme="dark"] {
+  --background-color: #111111;
+  --base-variant-color: #303030;
+  --text-color: #bdbdbd;
+  --link-color: #a78bfa;
 }
 
-
-html{
-    font-family: 'Cascadia Code', Consolas, Helvetica, 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+html {
+  font-family: 'Cascadia Code', Consolas, 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
 }
 
 body {
-    color: var(--textColor);
-    background-color: var(--backgroundColor);
-    margin: 0 auto;
-    padding: 0 14px;
-    box-sizing: border-box;
-    transition: all 1s ease;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  margin: 0 auto;
+  padding: 0 14px;
+  box-sizing Seminar: border-box;
+  max-width: 1000px;
 }
-header{
-    max-width: 100%;
+
+header {
+  max-width: 100%;
 }
+
 a {
-    color: #754ea5;
-    text-decoration-line: none;
+  color: var(--link-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 p {
-    color: var(--fontColor);
-}
-
-@media (min-width: 1024px) {
-    body {
-        max-width: 1000px;
-    }
+  color: var(--text-color);
 }
 
 @media (max-width: 1023px) {
-    body {
-        max-width: 100%;
-    }
+  body {
+    max-width: 100%;
+  }
 }
 
-@media only screen and (min-device-width: 320px) and (max-device-width: 768px) {
-    img {
-        max-width: 100%;
-        height: auto;
-    }
+@media (max-width: 768px) {
+  img {
+    max-width: 100%;
+    height: auto;
+  }
 }
 
 .navigation-bar {
-    height: 20px;
-    padding: 40px 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: var(--textColor) 1px solid;
+  height: 20px;
+  padding: 40px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--text-color);
 }
 
-.navigation-bar .menu{
-    margin-right: -9px;
-    text-align: right;
-    user-select: none;
+.navigation-bar .menu {
+  margin-right: -9px;
+  text-align: right;
+  user-select: none;
 }
 
-.navigation-bar .menu a{
-    display: inline-block;
-    font-size: 20px;
-    color: var(--textColor);
-    margin: 4px 9px;
-    white-space: nowrap;
-    user-select: none;
+.navigation-bar .menu a {
+  display: inline-block;
+  font-size: 20px;
+  color: var(--text-color);
+  margin: 4px 9px;
+  white-space: nowrap;
+  user-select: none;
+  transition: color 0.3s ease;
 }
 
-.logo{
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    -webkit-user-drag: none;
-    user-select: none;
-    box-shadow: 0 0 6px 1px rgba(0, 0, 0, 0.18);
+.logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  -webkit-user-drag: none;
+  user-select: none;
+  box-shadow: 0 0 6px 1px rgba(0, 0, 0, 0.18);
+  transition: box-shadow 0.3s ease;
 }
 
-.index-sentence{
-    margin: auto;
-    width: 200px;
-    padding-top: 30vh;
+.index-sentence {
+  margin: auto;
+  width: 200px;
+  padding-top: 30vh;
 }
 
-.typed-out{
-    overflow: hidden;
-    border-right: .1em solid var(--textColor);
-    font-size: 20pt;
-    white-space: nowrap;
-    width: 0;
-    animation: typing 1s steps(15,end) forwards,
-        blink 0.8s infinite;
-
+.typed-out {
+  overflow: hidden;
+  border-right: .1em solid var(--text-color);
+  font-size: 20pt;
+  white-space: nowrap;
+  width: 0;
+  animation: typing 1s steps(15,end) forwards,
+      blink 0.8s infinite;
 }
 
 @keyframes typing {
-    from { width: 0 }
-    to { width: 95% }
+  from { width: 0 }
+  to { width: 95% }
 }
 
 @keyframes blink {
-    from { border-color: transparent }
-    to { border-color: var(--textColor); }
+  from { border-color: transparent }
+  to { border-color: var(--text-color); }
 }
 
-
-ul#article-list a{
-    font-size: 15pt;
-    font-weight: 1000;
-    padding-top: 10px;
-    padding-bottom: 20px;
-    display: block;
-    color: var(--textColor);
-    text-decoration-line: none;
+ul#article-list a {
+  font-size: 15pt;
+  font-weight: bold;
+  padding-top: 10px;
+  padding-bottom: 20px;
+  display: block;
+  color: var(--text-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 ul#article-list {
-    padding-top: 10px;
-    padding-left: 0%;
+  padding-top: 10px;
+  padding-left: 0%;
+  list-style: none;
 }
 
-.otherlinks a{
-    color: var(--textColor);
-    text-decoration-line: none;
-}
-
-ul#article-list li{
-    list-style-type: none;
+.otherlinks a {
+  color: var(--text-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 img {
-    max-width: 100%;
-    height: auto;
-}
-
-.solian-post{
-    display: flex;
-    min-height: 150px;
-    height: 300px;
-}
-
-.solian-post-attachments{
-    display: flex;
-    height: auto;
-    overflow-x: auto; 
-    -ms-overflow-style:none; 
-    scrollbar-width:none;
-}
-.solian-post-attachments img{
-    height: 150px;
-}
-.solian-post-content{
-    padding-left: 5px;
-    margin: 0 0;
-    height: 300px
-}
-
-.solian-post-content p{
-    margin: 0 0;
+  max-width: 100%;
+  max-width: min(100%, 1000px);
+  height: auto;
 }
 
 #theme-switch {
-    border: none;
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    border-radius: 50%;
-    background-color: var(--base-variant-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
-    z-index: 1;
+  border: none;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  background-color: var(--base-variant-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 #theme-switch svg {
-    fill: var(--textColor);
+  fill: var(--text-color);
+  transition: fill 0.3s ease;
 }
 
-#theme-switch svg:last-child{
-    display: none;
+#theme-switch svg:last-child {
+  display: none;
 }
 
-.dark #theme-switch svg:first-child{
-    display: none;
+[data-theme="dark"] #theme-switch svg:first-child {
+  display: none;
 }
 
-.dark #theme-switch svg:last-child{
-    display: block;
+[data-theme="dark"] #theme-switch svg:last-child {
+  display: block;
 }
