@@ -15,6 +15,12 @@
   <link rel="icon" href="/favicon.ico" type="image/x-icon" />
   <script src="/resources/js/highlight.min.js"></script>
   <script src="/resources/js/add_code_copy_button.js" defer></script>
+  <script>
+    const darkmode = localStorage.getItem("darkmode") || 
+      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "active" : "disabled");
+    document.documentElement.setAttribute("data-theme", darkmode === "active" ? "dark" : "light");
+    localStorage.setItem("darkmode", darkmode);
+  </script>
 </head>
 
 <body>
