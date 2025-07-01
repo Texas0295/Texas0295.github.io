@@ -28,7 +28,11 @@
         .then((articles) => {
           const list = document.getElementById("article-list");
 
-          articles.reverse();
+          articles.sort((a, b) => {
+            const timeA = a.file.slice(0, 14);
+            const timeB = b.file.slice(0, 14);
+            return timeB.localeCompare(timeA); // 或 return timeB - timeA 也可（轉數字）
+            });
           articles.forEach((article) => {
             const listItem = document.createElement("li");
             const link = document.createElement("a");
