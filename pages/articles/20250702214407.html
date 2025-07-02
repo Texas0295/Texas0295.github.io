@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Rust: 所有權 - Texas0295's blog</title>
+    <meta name="description" content="Texas0295的個人部落格" />
+    <meta http-equiv="content-language" content="zh-hant" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta theme-color="#000000" />
+    <meta name="renderer" content="webkit" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/resources/css/article.css?v=1.1"
+    />
+    <script src="/resources/js/highlight.min.js"></script>
+    <script src="/resources/js/add_code_copy_button.js" defer></script>
+    <script>
+        const darkmode = localStorage.getItem("darkmode") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "active" : "disabled");
+        document.documentElement.setAttribute("data-theme", darkmode === "active" ? "dark" : "light");
+        localStorage.setItem("darkmode", darkmode);
+    </script>
+  </head>
+  <body>
+    <header>
+      <button id="theme-switch">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z"
+          />
+        </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z"
+          />
+        </svg>
+      </button>
+    </header>
+    <script src="/resources/js/darkmode.js"></script>
+    <div class="navigation-bar">
+      <a href="/"
+        ><img src="/resources/img/site/info-img.jpg" class="logo"
+      /></a>
+      <nav class="menu">
+        <a href="/">首頁</a>
+        <a href="/pages/articles.html">文章</a>
+        <a href="/pages/otherlinks.html">外鏈</a>
+        <a href="/pages/about.html">關於</a>
+      </nav>
+    </div>
+<h1>Rust: 所有權</h1>
+<h2>複習：堆疊(Stack) 與堆積(Heap)</h2>
+<p>相同點：都是程式碼執行時可使用的記憶體部分</p>
+<p>堆疊特有：</p>
+<ul>
+<li>遵循後入先出(LIFO)原則</li>
+<li>資料必須是<strong>已知固定</strong>大小</li>
+<li>相對堆積而言更快的速度</li>
+</ul>
+<p>堆積特有：</p>
+<ul>
+<li>在資料實際存入前需要預先<strong>配置(allocating)</strong> 一個足夠大小的空間</li>
+<li>存取要經過<strong>指針(pointer)</strong> ，配置行為本身也會返回一個指針</li>
+<li>指針有固定已知的大小，因而可以存放在堆疊上</li>
+</ul>
+<h2>所有權規則</h2>
+<ul>
+<li>Rust 中每個數值都有一個<strong>擁有者（owner）</strong></li>
+<li>同時間只能擁有一個擁有者</li>
+<li>擁有者離開作用域時，數值會被丟棄</li>
+</ul>
+<h2>記憶體與配置</h2>
+<p>對於<strong>未知大小</strong>的資料，需要記憶體配置器在堆積上配置一塊<strong>編譯時大小未知的記憶體</strong>來存放它</p>
+<p>這代表：</p>
+<ul>
+<li>記憶體配置器必須在<strong>執行時</strong>請求記憶體</li>
+<li>今後不再需要這個資料時，請求的記憶體需要<strong>歸還</strong>給配置器</li>
+</ul>
+<p>呼叫者需要關注第二部分的處理</p>
+<h2>如何釋放不再需要的資料</h2>
+<p>Java採用<strong>垃圾回收機制</strong>保證及時檢測不再使用的記憶體，但執行的時機<strong>不取決於</strong>開發者，造成垃圾回收的<strong>不確定性</strong>，因而效能無法很好的被保證</p>
+<p>C將記憶體釋放的操作<strong>下放給開發者</strong>，有利於效能。同時意味著如果開發者操作不當會增加<strong>安全風險</strong></p>
+<p>Rust採用所有權系統管理記憶體，保證高效的同時也不會造成由不正操作導致的安全風險</p>
+<p>Rust會在變數<strong>離開其作用域</strong>時呼叫<code>drop</code>方法來釋放記憶體 (<a href="https://zh.wikipedia.org/wiki/RAII">RAII，資源取得即初始化</a>)</p>
+<p>下列程式可視為RAII在rust中應用的一個典型例子：</p>
+<div class="pre_content"><pre><code class="language-rust">struct Resource {
+    name: String,
+}
+
+impl Resource {
+    fn new(name: &amp;str) - Resource {
+        println!("Acquiring resource: {}", name);
+        Resource {
+            name: name.to_string(),
+        }
+    }
+}
+
+impl Drop for Resource {
+    fn drop(&amp;mut self) {
+        println!("Releasing resource: {}", self.name);
+    }
+}
+
+fn main() {
+    {
+        let r = Resource::new("File Handle");
+        // Resource r 被使用
+    } // 作用域結束，r 被自動釋放，並調用了 drop()
+    println!("Out of scope, resource has been cleaned up.");
+}
+</code></pre></div>
+<h2>變數同資料的互動方式</h2>
+<h3>移動(Move)</h3>
+<p>考慮如下程式，其中String型別的實作是一個堆積資料</p>
+<div class="pre_content"><pre><code class="language-rust">let s1 = String::from("hello");
+let s2 = s1;
+</code></pre></div>
+<img src="/resources/img/trpl04-04.svg" />
+<p>如上圖，當<code>let s2 = s1;</code> 執行時，rust 會在<a href="https://zh.wikipedia.org/wiki/%E5%85%8B%E9%9A%86_(%E7%BC%96%E7%A8%8B)#%E6%B7%BA%E6%8B%B7%E8%B2%9D"><strong>淺拷貝</strong></a>之上<strong>無效化第一個變數</strong>，其被稱為<strong>移動(move)</strong></p>
+<p>無效化第一個變數是為了防止<strong>雙重釋放</strong></p>
+<h3>克隆(Clone)</h3>
+<p>執行深拷貝，效果如下圖</p>
+<img src="/resources/img/trpl04-03.svg" />
+<h3>拷貝(Copy)</h3>
+<p>拷貝僅對只在堆疊上的資料有效，其會複製一份新值給目標變數</p>
+<p>rust使用<code>Cpoy</code>特徵來標記這些<strong>只存在堆疊上</strong>的型別</p>
+<p><code>drop</code>特徵與<code>Copy</code>特徵<strong>互斥</strong></p>
+<h2>所有權與函式</h2>
+<p>如同變數一樣，所有權也可以進出函式，在函式間轉移</p>
+<p>下列程式展示了變數的所有權如何進入函式：</p>
+<div class="pre_content"><pre><code class="language-rust">fn main() {
+    let s = String::from("hello");  // s 進入作用域
+
+    takes_ownership(s);             // s 的值進入函式
+                                    // 所以 s 也在此無效
+
+    let x = 5;                      // x 進入作用域
+
+    makes_copy(x);                  // x 本該移動進函式裡
+                                    // 但 i32 有 Copy，所以 x 可繼續使用
+
+} // x 在此離開作用域，接著是 s。但因為 s 的值已經被移動了
+  // 它不會有任何動作
+
+fn takes_ownership(some_string: String) { // some_string 進入作用域
+    println!("{}", some_string);
+} // some_string 在此離開作用域並呼叫 `drop`
+  // 佔用的記憶體被釋放
+
+fn makes_copy(some_integer: i32) { // some_integer 進入作用域
+    println!("{}", some_integer);
+} // some_integer 在此離開作用域，沒有任何動作發生
+</code></pre></div>
+<p>以下程式展示了函式如何回傳所有權：</p>
+<div class="pre_content"><pre><code class="language-rust">fn main() {
+    let s1 = gives_ownership();         // gives_ownership 移動它的回傳值給 s1
+
+    let s2 = String::from("哈囉");     // s2 進入作用域
+
+    let s3 = takes_and_gives_back(s2);  // s2 移入 takes_and_gives_back
+                                        // 該函式又將其回傳值移到 s3
+} // s3 在此離開作用域並釋放
+  // s2 已被移走，所以沒有任何動作發生
+  // s1 離開作用域並釋放
+
+fn gives_ownership() - String {             // gives_ownership 會將他的回傳值
+                                             // 移動給呼叫它的函式
+
+    let some_string = String::from("你的字串"); // some_string 進入作用域
+
+    some_string                              // 回傳 some_string 並移動給
+                                             // 呼叫它的函式
+}
+
+// 此函式會取得一個 String 然後回傳它
+fn takes_and_gives_back(a_string: String) - String { // a_string 進入作用域
+
+    a_string  // 回傳 a_string 並移動給呼叫的函式
+}
+</code></pre></div>
+<h2>未被指派</h2>
+<p>考慮以下程式</p>
+<pre><code class="language-rust">fn main() {
+    let s1 = String::from("hello");
+    ret(s1);
+}
+
+fn ret(x: String) - String {
+    x
+}
+</code></pre>
+<p>在沒有指派變數給<code>ret(s1)</code>回傳的資料所有權時，rust會針對這個呼叫返回的資料建立一個<strong>臨時變數(Temporary value)</strong> ，該變數的生命週期會持續到該行結束，相當於此資料會被<strong>立即釋放</strong></p>
+<hr />
+<p>此文章採用<a href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"target="_blank"rel="license noopener noreferrer"style="display: inline-block">CC BY 4.0</a>協議共享</p>
+<p>於 2025-07-02</p>
+</body>
+</html>
