@@ -1,0 +1,22 @@
+[
+    {
+        "name": "首頁",
+        "url": "/"
+    },
+    {
+        "name": "文章",
+        "url": "/pages/articles.html"
+    },
+    {
+        "name": "日誌",
+        "url": "/pages/journals.html"
+    },
+    {
+        "name": "外鏈",
+        "url": "/pages/otherlinks.html"
+    },
+    {
+        "name": "關於",
+        "url": "/pages/about.html"
+    }
+]

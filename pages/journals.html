@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-  <title>外鏈 - Texas0295's blog</title>
+  <title>日誌 - Texas0295's blog</title>
   <meta name="description" content="Texas0295的個人部落格" />
   <meta http-equiv="content-language" content="zh-hant" />
   <link
@@ -21,7 +21,32 @@
     document.documentElement.setAttribute("data-theme", darkmode === "active" ? "dark" : "light");
     localStorage.setItem("darkmode", darkmode);
   </script>
- <script src="/resources/js/add_code_copy_button.js" defer></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      fetch("/resources/json/journals.json")
+        .then((response) => response.json())
+        .then((journals) => {
+          const list = document.getElementById("article-list");
+
+          journals.sort((a, b) => {
+            const timeA = a.file.slice(0, 14);
+            const timeB = b.file.slice(0, 14);
+            return timeB.localeCompare(timeA);
+            });
+          journals.forEach((journal) => {
+            const listItem = document.createElement("li");
+            const link = document.createElement("a");
+            link.href = `/pages/journals/${journal.file}`;
+            link.textContent = `${journal.title} - ${journal.date}`;
+
+            listItem.appendChild(link);
+            list.appendChild(listItem);
+          });
+        })
+        .catch((error) => console.error("無法讀取日誌列表", error));
+    });
+  </script>
+<
 </head>
 
 <body>
@@ -51,19 +76,11 @@
       </svg>
     </button>
   </header>
-  <script src="/resources/js/darkmode.js"></script>
   <div class="navigation-bar">
     <a href="/"><img src="/resources/img/site/info-img.jpg" class="logo" /></a>
     <nav id="navigation-bar" class="menu"></nav>
   </div>
-
-  <div class="otherlinks">
-    <h1>外部のサイト</h1>
-    <h2>搜尋引擎</h2>
-    <p><a href="https://google.com">Google</a></p>
-    <p><a href="https://bing.com">Bing</a></p>
-    <h2>Blog</h2>
-    <p><a href="https://blog.tmaize.net/">TMaize Blog</a></p>
-    <p><a href="https://uni-ft.xyz">Unift's Blog</a></p>
-  </div>
+  <h1>日誌</h1>
+  <ul id="article-list"></ul>
+  <script src="/resources/js/darkmode.js"></script>
 </body>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>透過CloudFlare將github pages綁定至自訂網域 - Texas0295's blog</title>
+    <title>類型解離 - Texas0295's blog</title>
     <meta name="description" content="Texas0295的個人部落格" />
     <meta http-equiv="content-language" content="zh-hant" />
     <meta charset="utf-8" />
@@ -14,14 +14,14 @@
       type="text/css"
       href="/resources/css/article.css?v=1.1"
     />
+    <script src="/resources/js/highlight.min.js"></script>
+    <script src="/resources/js/add_code_copy_button.js" defer></script>
+    <script src="/resources/js/add_navigation_bar.js"></script>
     <script>
         const darkmode = localStorage.getItem("darkmode") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "active" : "disabled");
         document.documentElement.setAttribute("data-theme", darkmode === "active" ? "dark" : "light");
         localStorage.setItem("darkmode", darkmode);
     </script>
-   <script src="/resources/js/highlight.min.js"></script>
-    <script src="/resources/js/add_code_copy_button.js" defer></script>
-    <script src="/resources/js/add_navigation_bar.js"></script>
   </head>
   <body>
     <header>
@@ -57,45 +57,11 @@
       /></a>
     <nav id="navigation-bar" class="menu"></nav>
     </div>
-    <h1>透過CloudFlare將github pages綁定至自訂網域</h1>
-    <p>
-      對於在GitHub上託管的網頁，GitHub會為每個使用者或專案分配一個預設網域。用戶的個人或組織頁面會使用
-      (username).github.io，而專案頁面則會使用 (username).github.io/(repository)
-      作為其預設
-    </p>
-    <p>如果需要自訂網域，可以透過CloudFlare(CF)進行</p>
-    <h2>要求</h2>
-    <ul>
-      <li>已經購置了網域並綁定了CF的DNS伺服器</li>
-    </ul>
-    <h2>過程</h2>
-    <p>以該部落格的網域(texas-0295.xyz)為例，在DNS記錄中新增兩條別名解析</p>
-    <p><img src="/resources/img/20240922103310-1.png" alt="" /></p>
-    <p>
-      需要注意的是，<code>www</code> 原理上是可選的，但不建議將其去除。因為<code
-        >www</code
-      >
-      作為一個為大眾熟知的子網域，會有很大機率使得用戶會輸入 www.texas-0295.xyz
-      導致無法訪問。因此建議保留並綁定這個子網域。
-    </p>
-    <p>
-      之後在Github專案的<code>Setting &gt; Pages</code>中找到Custom domain
-      ，填入你的網域並保存
-    </p>
-    <p>Github會檢查及驗證你的DNS記錄</p>
-    <p><img src="/resources/img/20240922103310-2.png" alt="" /></p>
-    <p>完成後即可透過此網域訪問網頁</p>
-    <p><img src="/resources/img/20240922103310-3.png" alt="" /></p>
-    <hr />
-    <p>
-      此文章採用<a
-        href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
-        target="_blank"
-        rel="license noopener noreferrer"
-        style="display: inline-block"
-        >CC BY 4.0</a
-      >協議共享
-    </p>
-    <p>於 2024-09-22</p>
-  </body>
+<h1>類型解離</h1>
+<p>正式文章發表在<code>Articles</code>那裏，隻言片語放到<code>Journals</code>這裏</p>
+<p>運行日誌這個概念不錯</p>
+<hr />
+<p>如無特殊說明，所有內容採用<a href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"target="_blank"rel="license noopener noreferrer"style="display: inline-block">CC BY 4.0</a>協議共享</p>
+<p>於 2025-07-02</p>
+</body>
 </html>
