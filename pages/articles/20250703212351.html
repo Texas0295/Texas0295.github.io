@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Rust: 參考 - Texas0295's blog</title>
+    <meta name="description" content="Texas0295的個人部落格" />
+    <meta http-equiv="content-language" content="zh-hant" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta theme-color="#000000" />
+    <meta name="renderer" content="webkit" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/resources/css/article.css?v=1.1"
+    />
+    <script src="/resources/js/highlight.min.js"></script>
+    <script src="/resources/js/add_code_copy_button.js" defer></script>
+    <script src="/resources/js/add_navigation_bar.js"></script>
+    <script>
+        const darkmode = localStorage.getItem("darkmode") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "active" : "disabled");
+        document.documentElement.setAttribute("data-theme", darkmode === "active" ? "dark" : "light");
+        localStorage.setItem("darkmode", darkmode);
+    </script>
+  </head>
+  <body>
+    <header>
+      <button id="theme-switch">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z"
+          />
+        </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z"
+          />
+        </svg>
+      </button>
+    </header>
+    <script src="/resources/js/darkmode.js"></script>
+    <div class="navigation-bar">
+      <a href="/"
+        ><img src="/resources/img/site/info-img.jpg" class="logo"
+      /></a>
+    <nav id="navigation-bar" class="menu"></nav>
+    </div>
+<h1>Rust: 參考</h1>
+<ul>
+<li>類似於指向某個地址的<strong>指針</strong></li>
+<li>地址仍然被<strong>其他變數</strong>所擁有</li>
+<li>所指向的特別型別的數值<strong>一定是</strong>有效的</li>
+<li>默認是<strong>不可變的</strong></li>
+</ul>
+<p>下列程式展示了參考的使用過程：</p>
+<div class="pre_content"><pre><code class="language-rust">fn main() {
+    let s1 = String::from("hello");
+
+    let len = calculate_length(&amp;s1);//傳遞了一個指向s1的參考
+
+    println!("'{}' 的長度為 {}。", s1, len);
+}
+
+fn calculate_length(s: &amp;String) -usize {//參數被宣告為接受一個參考
+    s.len()
+}
+</code></pre></div>
+<p>示意圖如下：</p>
+<img src="/resources/img/trpl04-05.svg" />
+<p>參考的反向動作是解參考(dereferencing)  範例為<code>*s1</code></p>
+<p>參考離開作用域時其指向的資料也<strong>不會</strong>被丟棄，資料的所有權仍然由參考<strong>指向的變數</strong>所有</p>
+<h2>借用</h2>
+<p>建立參考的動作被稱為借用</p>
+<p>借用<strong>分為不可變借用和可變借用</strong>，對應不可變參考與可變參考</p>
+<p>嘗試修改不可變借用的資料會產生編譯期錯誤</p>
+<p>要實現可變借用，需要建立<strong>可變參考</strong></p>
+<h2>可變參考</h2>
+<p>參考預設是不可變的，在加入<code>mut</code>關鍵字後其會轉變成可變參考</p>
+<p>以下程式展示了可變參考的工作過程：</p>
+<div class="pre_content"><pre><code class="language-rust">fn main() {
+    let mut s = String::from("hello");//要建立一個可變參考，首先保證被借用的變數本身可變
+
+    change(&amp;mut s);//建立了一個可變參考並傳遞給函式
+}
+
+fn change(some_string: &amp;mut String) {
+    some_string.push_str(", world");//函式接收可變參考，開始對資料作出修改
+}//可變參考退出作用域，修改後的資料繼續由可變變數s持有
+</code></pre></div>
+<p>可變參考的限制：</p>
+<ul>
+<li>在<strong>同一個作用域</strong>內有且僅有一個可變參考</li>
+<li>無法在擁有可變參考的<strong>同時</strong>擁有不可變參考</li>
+</ul>
+<p>可以同時擁有<strong>數個</strong>不可變參考</p>
+<h2>參考規則</h2>
+<ul>
+<li><strong>任意時刻，在同一作用域內</strong>，只能有<strong>一個可變參考</strong>或<strong>多個不可變參考</strong>，二者<strong>無法共存</strong></li>
+<li>參考必須<strong>永遠有效</strong></li>
+</ul>
+<h2>參考檢查及其時機</h2>
+<p>rust的參考檢查機制僅在參考被<strong>使用</strong>時檢查是否違反參考規則</p>
+<p>下列程式</p>
+<div class="pre_content"><pre><code class="language-rust">fn main(){
+    let mut s1 = String::from("hello");
+
+    let immutable_s = &amp;s1;
+    let mutable_s = &amp;mut s1;
+}
+</code></pre></div>
+<p>違反了參考規則，但仍然能通過rust的編譯，核心在於兩個參考都<strong>未被使用</strong></p>
+<p>rust的編譯器足夠智能，可以檢查到這些參考<strong>未被實際用於訪問他們指向的資料</strong></p>
+<p>參考規則僅在參考<strong>被使用時</strong>生效，而不是僅被聲明時</p>
+<h2>參考檢查的意義</h2>
+<p>參考檢查的最大意義就是避免<strong>資料競爭</strong></p>
+<p>要發生資料競爭，需要<strong>同時滿足</strong>以下三個條件：</p>
+<ul>
+<li>有<strong>兩個或更多的</strong>指針存取<strong>同一個</strong>資料</li>
+<li><strong>至少有一個</strong>指針在修改資料</li>
+<li>這些操作是<strong>無序的</strong>，沒有針對資料的同步存取機制</li>
+</ul>
+<p>資料競爭會造成未定義行為(undefined behavior)</p>
+<p>rust透過參考檢查能在編譯時就檢查到這些問題並阻止其被編譯通過，保證資料競爭無法發生</p>
+<h2>迷途參考</h2>
+<p><strong>迷途指針</strong></p>
+<p>是指一個指針仍然存在，但指向的記憶體已經被釋放的情形</p>
+<p>這種情況下再使用指針存取資料會導致未定義行為</p>
+<p>常見於需要手動管理記憶體的語言（C或C++）</p>
+<p>以下是C++的一個例子：</p>
+<div class="pre_content"><pre><code class="language-cpp">int* dangling_pointer() {
+    int x = 42;
+    return &amp;x; // 返回一個指向局部變數的指針
+}
+
+int main() {
+    int* ptr = dangling_pointer(); // ptr 現在指向無效的記憶體
+    // 存取 *ptr 會導致未定義行為
+}
+</code></pre></div>
+<p>在rust中，迷途指針會在編譯時就被找出並防止其被編譯通過，保證不會產生迷途指針</p>
+<p>以下是一個造成編譯失敗的迷途指針範例：</p>
+<div class="pre_content"><pre><code class="language-rust">fn main() {
+    let r; // 宣告一個引用
+
+    {
+        let x = 5;
+        r = &amp;x; // 借用 x
+    } // x 在這裡離開作用域並被釋放
+
+    println!("r: {}", r); // 錯誤：r 指向無效記憶體
+}
+</code></pre></div>
+<hr />
+<p>如無特殊說明，所有內容採用<a href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"target="_blank"rel="license noopener noreferrer"style="display: inline-block">CC BY 4.0</a>協議共享</p>
+<p>於 2025-07-03</p>
+</body>
+</html>
