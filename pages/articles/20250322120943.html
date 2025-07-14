@@ -16,7 +16,16 @@
         document.documentElement.setAttribute("data-theme", darkmode === "active" ? "dark" : "light");
         localStorage.setItem("darkmode", darkmode);
     </script>
-
+    <script>
+        window.addEventListener('load', () => {
+        const toc = document.querySelector('.toc-container');
+        if (window.innerWidth <= 1023 && toc) {
+        toc.classList.remove('expanded');
+        toc.classList.add('collapsed');
+        }
+    });
+</script>
+ 
     <script src="/resources/js/add_navigation_bar.js"></script>
     <script src="/resources/js/add_code_copy_button.js" defer></script>
   </head>
