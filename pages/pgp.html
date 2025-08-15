@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-  <title>關於 - Texas0295's blog</title>
+  <title>PGP - Texas0295's blog</title>
   <meta name="description" content="Texas0295的個人部落格" />
   <meta http-equiv="content-language" content="zh-hant" />
   <link
@@ -57,27 +57,30 @@
     <a href="/"><img src="/resources/img/site/info-img.jpg" class="logo" /></a>
     <nav id="navigation-bar" class="menu"></nav>
   </div>
-  <div style="text-align:center">
-    <h1>手に触るることも叶はぬ光を放ち</h1>
-    <h1>青く澄みたる瑠璃の玉のごとくなる御方よ</h1>
-    <h1>テキサス御姫君</h1>
-  </div>
-  <h2>私について</h2>
+
+<main style="padding-top:5px;line-height: 1.7;font-size: 15pt;">
+  <h1> PGP 公開鍵</h1>
   <p>
-    メール:
-    <a href="mailto:Texas0295@outlook.com">Texas0295@outlook.com</a>
+    您可透過 <a href="https://keys.openpgp.org" target="_blank">keys.openpgp.org</a> 使用 WKD 查詢我的公開金鑰<br>
+    若使用支援 WKD 的郵件客戶端，亦可於信件撰寫階段自動取得密鑰
   </p>
-  <p>Twitter: <a href="https://twitter.com/Texas0295">@Texas0295</a></p>
-  <p>GitHub: <a href="https://github.com/Texas0295">Texas0295</a></p>
-  <h2>このサイトについて</h2>
-  <p><a href="/resources/rss/rss.xml">RSSはこちら</a></p>
-  <p><a href="pgp.html">PGPはこちら</a></p>
   <p>
-    本網站的設計是對<a href="https://blog.tmaize.net/">tmaize blog</a>的拙劣模仿
+    GnuPG 指令查詢範例如下：<br>
+    <code>gpg --auto-key-locate wkd --locate-key your@email.com</code>
   </p>
-  <h2>Tech Stack</h2>
-  <li>Java</li>
-  <li>Rust</li>
+  <p>
+    建議比對如下指紋後再導入：
+  </p>
+  <p>
+    <strong>Fingerprint：</strong><br />
+    <code style="word-break: break-all;">2B4C 119A 188E 0672 87F0  5E30 BFE2 6B74 CDC8 51FB</code>
+  </p>
+  <p>
+    亦可直接下載公鑰檔案：<br>
+    <a href="/resources/pgp/publickey.asc" download> publickey.asc（點此下載）</a>
+  </p>
+  <p><i>若您收到來自本人的加密郵件或簽章內容，但指紋不符，請立即與我聯絡。</i></p>
+</main>
   <hr />
   <p><i>「草はしおれ、花はしぼむ、しかし神のおことばは、いつまでもすれたることがない」(イザヤ書40:8)</i></p>
 </body>
