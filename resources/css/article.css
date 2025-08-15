@@ -203,6 +203,61 @@ pre {
   display: block;
 }
 
+.modal.hidden {
+  display: none;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  padding: 1.6em 2.2em;
+  border-radius: 8px;
+  max-width: 90%;
+  width: 360px;
+  text-align: center;
+  box-shadow: 0 0 8px rgba(0,0,0,0.2);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.modal-content p {
+  margin-bottom: 1.5em;
+  font-size: 14pt;
+  line-height: 1.6;
+  color: var(--text-color);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1.2em;
+}
+
+.modal-actions button {
+  background-color: var(--base-variant-color);
+  color: var(--text-color);
+  border: none;
+  padding: 0.6em 1.4em;
+  font-size: 12pt;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.modal-actions button:hover {
+  background-color: var(--link-color);
+  color: #fff;
+}
+
 .hljs {
   background: var(--pre-background-color);
   color: var(--text-color);
