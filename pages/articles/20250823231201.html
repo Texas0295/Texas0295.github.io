@@ -85,7 +85,7 @@
 
 <h1 id="wireguard在openwrt上的初步設定及使用">WireGuard在OpenWRT上的初步設定及使用</h1>
 <p>WireGuard 是一個 VPN 協議，搭配 OpenWrt，可以在外連回住所網路以訪問內網服務</p>
-<p>本文基於 OpenWrt 24.10.1，出現的所有指令若無特殊說明，默認需要ssh到OpenWrt上執行。</p>
+<p>本文基於 OpenWrt 24.10.1，出現的所有指令若無特殊說明，默認需要ssh到OpenWrt上執行</p>
 <h2 id="環境準備">環境準備</h2>
 <h3 id="硬體系統">硬體 / 系統</h3>
 <ul>
@@ -102,7 +102,7 @@ opkg install wireguard-tools luci-proto-wireguard kmod-wireguard
 只需要確認有無分配到全球 IPv6（2xxx/24xx/240e 開頭）的地址即可：</p>
 <div class="pre_content"><pre><code class="language-sh">ip -6 addr show dev br-lan
 </code></pre></div>
-<p>若只有 <code>fe80::</code> 開頭的 link-local，說明 ISP 未分配。</p>
+<p>若只有 <code>fe80::</code> 開頭的 link-local，說明 ISP 未分配</p>
 <h2 id="4wireguard服務端配置">4. WireGuard 服務端配置</h2>
 <h3 id="生成密鑰對">生成密鑰對</h3>
 <div class="pre_content"><pre><code class="language-sh">wg genkey | tee server.key | wg pubkey &gt; server.pub
@@ -123,9 +123,9 @@ config wireguard_wg0
         list allowed_ips 'fd87:8400:2289:0904::2/128'
 </code></pre></div>
 <p>前者定義了一張虛擬網卡(interface wg0)，協議爲 <code>wireguard</code></p>
-<p>兩個<code>addresses</code>分別對應了將要爲其分配的，兩個協議的私有網段。只要格式正確就可以自訂</p>
+<p>兩個<code>addresses</code>分別對應了將要爲其分配的，兩個協議的私有網段只要格式正確就可以自訂</p>
 <p>後者是對應的某個客戶端(PEER)的設定</p>
-<p>先前生成的<code>client.key</code>和 <code>server.pub</code> 需要分發到那個客戶端的手裏才能被用來認證。</p>
+<p>先前生成的<code>client.key</code>和 <code>server.pub</code> 需要分發到那個客戶端的手裏才能被用來認證</p>
 <p>需要注意的是客戶端的位址是被顯式指定的，客戶端配置節點的時候也要顯式的填上這個唯一位址</p>
 <h2 id="5防火牆">5. 防火牆</h2>
 <p>在OpenWrt默認的防火牆設定下端口會被封鎖，需要手動開放 IPv6 UDP/51820</p>
