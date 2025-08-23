@@ -132,9 +132,9 @@ config wireguard_wg0
 <p>在 <code>/etc/config/firewall</code> 檔案的末尾追加如下內容：</p>
 <div class="pre_content"><pre><code class="language-sh">config zone 
         option name 'wg'
-        option input REJECT
+        option input ACCEPT
         option output ACCEPT
-        option forward REJECT
+        option forward ACCEPT 
         option network 'wg0' 
 
 config forwarding
