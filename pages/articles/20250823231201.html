@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WireGuard在OpenWRT上的初步設定及使用 - Texas0295's blog</title>
+    <meta name="description" content="Texas0295的個人部落格" />
+    <meta http-equiv="content-language" content="zh-hant" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta theme-color="#000000" />
+    <meta name="renderer" content="webkit" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/resources/css/article.css?v=1.1"
+    />
+    <script src="/resources/js/highlight.min.js"></script>
+    <script src="/resources/js/add_code_copy_button.js" defer></script>
+    <script src="/resources/js/add_navigation_bar.js"></script>
+    <script src="/resources/js/add_toc.js"></script>
+    <script>
+        const darkmode = localStorage.getItem("darkmode") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "active" : "disabled");
+        document.documentElement.setAttribute("data-theme", darkmode === "active" ? "dark" : "light");
+        localStorage.setItem("darkmode", darkmode);
+    </script>
+    <script>
+        window.addEventListener('load', () => {
+        const toc = document.querySelector('.toc-container');
+        if (window.innerWidth <= 1023 && toc) {
+            toc.classList.remove('expanded');
+            toc.classList.add('collapsed');
+        }
+        });
+    </script>
+  </head>
+  <body>
+    <header>
+      <button id="theme-switch">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z"
+          />
+        </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z"
+          />
+        </svg>
+      </button>
+    </header>
+    <script src="/resources/js/darkmode.js"></script>
+    <div class="navigation-bar">
+      <a href="/"
+        ><img src="/resources/img/site/info-img.jpg" class="logo"
+      /></a>
+    <nav id="navigation-bar" class="menu"></nav>
+    <button class="toc-toggle-btn" onclick="toggleTOC()">☰</button>
+    </div>
+    <main>
+        <article class="article-content"><div class="toc-container">
+<ul class="toc">
+<li class="toc-level-1"><a href="#wireguard在openwrt上的初步設定及使用">WireGuard在OpenWRT上的初步設定及使用</a></li>
+<li class="toc-level-2"><a href="#環境準備">環境準備</a></li>
+<li class="toc-level-3"><a href="#硬體系統">硬體 / 系統</a></li>
+<li class="toc-level-3"><a href="#軟體">軟體</a></li>
+<li class="toc-level-2"><a href="#3確認ipv6公網">3. 確認 IPv6 公網</a></li>
+<li class="toc-level-2"><a href="#4wireguard服務端配置">4. WireGuard 服務端配置</a></li>
+<li class="toc-level-3"><a href="#生成密鑰對">生成密鑰對</a></li>
+<li class="toc-level-3"><a href="#建立接口">建立接口</a></li>
+<li class="toc-level-2"><a href="#5防火牆">5. 防火牆</a></li>
+</ul>
+</div>
+
+<h1 id="wireguard在openwrt上的初步設定及使用">WireGuard在OpenWRT上的初步設定及使用</h1>
+<p>WireGuard 是一個 VPN 協議，搭配 OpenWrt，可以在外連回住所網路以訪問內網服務</p>
+<p>本文基於 OpenWrt 24.10.1，出現的所有指令若無特殊說明，默認需要ssh到OpenWrt上執行。</p>
+<h2 id="環境準備">環境準備</h2>
+<h3 id="硬體系統">硬體 / 系統</h3>
+<ul>
+<li>路由器：支援 OpenWrt 並有 IPv6 公網</li>
+<li>系統版本：OpenWrt 24.10.1 aarch64_cortex-a53</li>
+</ul>
+<h3 id="軟體">軟體</h3>
+<p>WireGuard 相關工具與內核模組：</p>
+<div class="pre_content"><pre><code class="language-sh">opkg update
+opkg install wireguard-tools luci-proto-wireguard kmod-wireguard
+</code></pre></div>
+<h2 id="3確認ipv6公網">3. 確認 IPv6 公網</h2>
+<p>整套方案的硬性需求爲路由器在IPv6下的公網可達性
+只需要確認有無分配到全球 IPv6（2xxx/24xx/240e 開頭）的地址即可：</p>
+<div class="pre_content"><pre><code class="language-sh">ip -6 addr show dev br-lan
+</code></pre></div>
+<p>若只有 <code>fe80::</code> 開頭的 link-local，說明 ISP 未分配。</p>
+<h2 id="4wireguard服務端配置">4. WireGuard 服務端配置</h2>
+<h3 id="生成密鑰對">生成密鑰對</h3>
+<div class="pre_content"><pre><code class="language-sh">wg genkey | tee server.key | wg pubkey &gt; server.pub
+wg genkey | tee client.key | wg pubkey &gt; client.pub
+</code></pre></div>
+<h3 id="建立接口">建立接口</h3>
+<p>在 <code>/etc/config/network</code> 檔案末尾追加如下內容：</p>
+<div class="pre_content"><pre><code>config interface 'wg0'
+        option proto 'wireguard'
+        option private_key '&lt;填上生成的 server.key&gt;'
+        option listen_port '51820'
+        list addresses 'fd87:8400:2289:0904::1/64'
+        list addresses '10.0.0.1/24'
+
+config wireguard_wg0
+        option public_key '&lt;填上生成的 client.pub&gt;'
+        list allowed_ips '10.0.0.2/32'
+        list allowed_ips 'fd87:8400:2289:0904::2/128'
+</code></pre></div>
+<p>前者定義了一張虛擬網卡(interface wg0)，協議爲 <code>wireguard</code></p>
+<p>兩個<code>addresses</code>分別對應了將要爲其分配的，兩個協議的私有網段。只要格式正確就可以自訂</p>
+<p>後者是對應的某個客戶端(PEER)的設定</p>
+<p>先前生成的<code>client.key</code>和 <code>server.pub</code> 需要分發到那個客戶端的手裏才能被用來認證。</p>
+<p>需要注意的是客戶端的位址是被顯式指定的，客戶端配置節點的時候也要顯式的填上這個唯一位址</p>
+<h2 id="5防火牆">5. 防火牆</h2>
+<p>在OpenWrt默認的防火牆設定下端口會被封鎖，需要手動開放 IPv6 UDP/51820</p>
+<p>在 <code>/etc/config/firewall</code> 檔案的末尾追加如下內容：</p>
+<div class="pre_content"><pre><code class="language-sh">config zone 
+        option name 'wg'
+        option input REJECT
+        option output ACCEPT
+        option forward REJECT
+        option network 'wg0' 
+
+config forwarding
+        option src 'wg'
+        option dest 'lan'
+
+config forwarding
+        option src 'wg'
+        option dest 'wan'
+
+config rule
+        option name 'Allow-WireGuard'
+        option src 'wan'
+        option dest_port '51820'
+        option proto 'udp'
+        option target 'ACCEPT'
+
+config rule
+        option name 'Allow-ICMPv6-From-WAN'
+        option src 'wan'
+        option proto 'icmp'
+        option family 'ipv6'
+        option target ACCEPT
+
+config rule
+        option name 'Allow-ICMPv6-From-WG'
+        option src 'wg'
+        option proto 'icmp'
+        option family 'ipv6'
+        option target 'ACCEPT'
+</code></pre></div>
+<p>兩條<code>forwarding</code>鏈中，前者保證內網設備可達性，後者保證外部設備也可經路由上網，可依照需求配置</p>
+<p>IPv6 通訊需要 ICMPv6 來完成路徑 MTU 探測與鄰居發現，因此是必要的</p>
+<p>最後分別重啓 <code>network</code> 和 <code>firewall</code>，伺服器端應當就可以正常運作了</p>
+<div class="pre_content"><pre><code class="language-sh">/etc/init.d/network restart
+/etc/init.d/firewall restart
+</code></pre></div>
+<p>若要驗證是否啓動</p>
+<div class="pre_content"><pre><code>wg show
+</code></pre></div>
+<hr />
+<p class="license">
+  如無特殊說明，所有內容採用
+  <a
+    href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
+    target="_blank"
+    rel="license noopener noreferrer"
+    style="display: inline-block"
+  >CC BY 4.0</a> 協議共享
+</p>
+<p class="post-date">於 2025-08-23 (臺北標準時)</p>
+</article>
+</main>
+</body>
+</html>
