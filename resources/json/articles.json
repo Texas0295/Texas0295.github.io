@@ -88,5 +88,10 @@
     "title": "WireGuard在OpenWRT上的初步設定及使用",
     "file": "20250823231201.html",
     "date": "2025-08-23"
+  },
+  {
+    "title": "git format-patch 與 send-email：郵件驅動的去平臺化協作入門",
+    "file": "20250903205542.html",
+    "date": "2025-09-03"
   }
 ]

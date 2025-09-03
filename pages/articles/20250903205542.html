@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>git format-patch 與 send-email：郵件驅動的去平臺化協作入門 - Texas0295's blog</title>
+    <meta name="description" content="Texas0295的個人部落格" />
+    <meta http-equiv="content-language" content="zh-hant" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta theme-color="#000000" />
+    <meta name="renderer" content="webkit" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/resources/css/article.css?v=1.1"
+    />
+    <script src="/resources/js/highlight.min.js"></script>
+    <script src="/resources/js/add_code_copy_button.js" defer></script>
+    <script src="/resources/js/add_navigation_bar.js"></script>
+    <script src="/resources/js/add_toc.js"></script>
+    <script>
+        const darkmode = localStorage.getItem("darkmode") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "active" : "disabled");
+        document.documentElement.setAttribute("data-theme", darkmode === "active" ? "dark" : "light");
+        localStorage.setItem("darkmode", darkmode);
+    </script>
+    <script>
+        window.addEventListener('load', () => {
+        const toc = document.querySelector('.toc-container');
+        if (window.innerWidth <= 1023 && toc) {
+            toc.classList.remove('expanded');
+            toc.classList.add('collapsed');
+        }
+        });
+    </script>
+  </head>
+  <body>
+    <header>
+      <button id="theme-switch">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z"
+          />
+        </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z"
+          />
+        </svg>
+      </button>
+    </header>
+    <script src="/resources/js/darkmode.js"></script>
+    <div class="navigation-bar">
+      <a href="/"
+        ><img src="/resources/img/site/info-img.jpg" class="logo"
+      /></a>
+    <nav id="navigation-bar" class="menu"></nav>
+    <button class="toc-toggle-btn" onclick="toggleTOC()">☰</button>
+    </div>
+    <main>
+        <article class="article-content"><div class="toc-container">
+<ul class="toc">
+<li class="toc-level-1"><a href="#gitformatpatch與sendemail郵件驅動的去平臺化協作入門">git format-patch 與 send-email：郵件驅動的去平臺化協作入門</a></li>
+<li class="toc-level-2"><a href="#基本原理">基本原理</a></li>
+<li class="toc-level-3"><a href="#gitformatpatch">git format-patch</a></li>
+<li class="toc-level-3"><a href="#gitsendemail">git send-email</a></li>
+<li class="toc-level-2"><a href="#示例">示例</a></li>
+<li class="toc-level-3"><a href="#環境配置">環境配置</a></li>
+<li class="toc-level-3"><a href="#修改提交生成patch">修改，提交，生成patch</a></li>
+<li class="toc-level-3"><a href="#傳送patchdtm">傳送 patch（DTM）</a></li>
+</ul>
+</div>
+
+<h1 id="gitformatpatch與sendemail郵件驅動的去平臺化協作入門">git format-patch 與 send-email：郵件驅動的去平臺化協作入門</h1>
+<p>在平臺化工具（如github,gitlab）興起之前，一些大型專案（如Linux Kernel，Git自己）就已經建立基於郵件的協作流程。開發者將自己的本機修改轉化爲標準化的補丁檔案，隨後直接發送給上游Maintainer做Review，中間不需要藉助於任何平臺</p>
+<p>這種協作流程的優點有三：</p>
+<ul>
+<li>泛用支援與去平臺化：只需一個支援SMTP的郵件服務即可</li>
+<li>標準純文本：可存檔，審閱，離線處理</li>
+<li>可追蹤：Thread本身就天然保留了審核歷史</li>
+</ul>
+<h2 id="基本原理">基本原理</h2>
+<h3 id="gitformatpatch">git format-patch</h3>
+<p>可以使用<code>git format-patch</code> 將本機的提交轉換爲可郵寄的patch檔。</p>
+<p>這個patch檔案將會包含commit message，作者資訊及變更內容等完整的meta-data，上游可以透過<code>git am</code>直接應用</p>
+<p>例：</p>
+<div class="pre_content"><pre><code class="language-bash"># 以 origin/main 做為基準，取分岔後的所有提交
+git format-patch origin/main..
+# 簡化語法
+git format-patch origin/main
+</code></pre></div>
+<p>會從 <code>origin/main</code> 之後產生的所有提交生成一系列 <code>.patch</code> 檔案。</p>
+<p>若目前分支與基準相同（沒有新增提交），就不會產生任何 patch。此時可用下列兩種方式擷取提交：</p>
+<div class="pre_content"><pre><code class="language-bash"># 取當前分支最近 1/3 個提交
+git format-patch -1
+git format-patch -3
+
+# 或指定範圍：從 &lt;base&gt; 到現在
+git format-patch &lt;base&gt;..HEAD
+</code></pre></div>
+<p>透過傳入<code>--cover-letter</code>可以讓git生成一個模板cover letter，後面的示例中會講到這個cover letter的用法</p>
+<h3 id="gitsendemail">git send-email</h3>
+<p>git send-email 可以將<code>.patch</code>檔案透過SMTP服務傳送到指定的收件人(例如整個專案的Mailing List[ML])</p>
+<p>若沒有ML，而是向一個全權的上游Maintainer提交，我個人而言會稱其爲<strong>Direct-to-Maintainer(DTM)</strong></p>
+<p>整體流程大概如下：</p>
+<ol>
+<li>準備郵件（commit message + cover letter）</li>
+<li>使用SMTP傳送</li>
+</ol>
+<h2 id="示例">示例</h2>
+<h3 id="環境配置">環境配置</h3>
+<p>筆者目前使用的是<code>msmtp</code>代理送信，因此需要安裝</p>
+<div class="pre_content"><pre><code>sudo pacman -S msmtp
+</code></pre></div>
+<p>outlook現在只支援現代認證，從msmtp處理這個認證問題比較方便</p>
+<p>配置<code>.gitconfig</code></p>
+<div class="pre_content"><pre><code class="language-ini">[sendemail]
+    from = Texas0295 &lt;texas0295@outlook.com&gt;
+    smtpserver = /usr/bin/msmtp
+    annotate = yes
+    confirm = always
+    suppresscc = self
+    smtpserveroption = --read-envelope-from
+    smtpserveroption = --read-recipients
+</code></pre></div>
+<p>如果想要多重確認就把<code>annotate = yes</code>，<code>confirm = always</code>加上，防止一次性全扔出去</p>
+<p><code>suppresscc = self</code>用來防止給自己的抄送，若想留存可以<code>suppresscc = none</code></p>
+<p>配置<code>.msmtprc</code></p>
+<div class="pre_content"><pre><code>account default
+host smtp.office365.com
+port 587
+protocol smtp
+tls on
+tls_starttls on
+auth xoauth2
+
+user texas0295@outlook.com
+from texas0295@outlook.com
+passwordeval "~/.local/scripts/mutt_oauth2.py ~/.mutt/oauth2/outlook_unsafe.token"
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+</code></pre></div>
+<p>關於如何處理現代認證，本文並不着重於此，您可更換一個支援傳統帳密的服務提供商</p>
+<h3 id="修改提交生成patch">修改，提交，生成patch</h3>
+<p>進入專案倉庫</p>
+<p>這個專案倉庫存放了一個<code>acpi.log</code>作爲初始提交</p>
+<div class="pre_content"><pre><code class="language-bash">~/p/github_play (main) &gt; nvim acpi.log
+~/p/github_play (main *) &gt; git add acpi.log
+~/p/github_play (main +) &gt; git commit -s -m "[FIX] acpi_log: delete logs related to AE_NOT_FOUND"
+[main 01fa60f] [FIX] acpi_log: delete logs related to AE_NOT_FOUND
+ 1 file changed, 4 deletions(-)
+</code></pre></div>
+<p>這裏的 <code>-s</code> 旗標是爲commit進行DCO簽署（Signed-off-by），是一個可選項</p>
+<p>隨後生成單個commit的patch（附cover-letter）</p>
+<div class="pre_content"><pre><code class="language-bash">~/p/github_play (main) &gt; git format-patch -1 HEAD --cover-letter
+0000-cover-letter.patch
+0001-FIX-acpi_log-delete-logs-related-to-AE_NOT_FOUND.patch
+</code></pre></div>
+<p>若要生成多個commit的patch，則更改<code>-1</code>爲你需要的commit數量即可</p>
+<p>一個標準化的patch檔案大概含有下列內容：</p>
+<p>(IN FILE 0001-FIX-acpi_log-delete-logs-related-to-AE_NOT_FOUND.patch )</p>
+<div class="pre_content"><pre><code>From 01fa60fe81a7c5c6dfe640e36bca7c5280c23761 Mon Sep 17 00:00:00 2001
+From: Texas0295 &lt;Texas0295@outlook.com&gt;
+Date: Wed, 3 Sep 2025 20:08:23 +0800
+Subject: [PATCH 1/1] [FIX] acpi_log: delete logs related to AE_NOT_FOUND
+
+Signed-off-by: Texas0295 &lt;Texas0295@outlook.com&gt;
+---
+ acpi.log | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/acpi.log b/acpi.log
+index 8d83632..3980e6b 100644
+--- a/acpi.log
++++ b/acpi.log
+@@ -1,7 +1,3 @@
+- 9月 03 18:48:57 pl kernel: ACPI BIOS Error (bug): Could not resolve symbol [\_SB.PC00.I2C2.TPL1], AE_NOT_FOUND (20250404/dswload2-162)
+- 9月 03 18:48:57 pl kernel: ACPI BIOS Error (bug): Could not resolve symbol [\_SB.PC00.I2C1.TPL1], AE_NOT_FOUND (20250404/dswload2-162)
+- 9月 03 18:48:57 pl kernel: ACPI BIOS Error (bug): Could not resolve symbol [\_SB.PC00.I2C0.TPL1], AE_NOT_FOUND (20250404/dswload2-162)
+- 9月 03 18:48:57 pl kernel: ACPI BIOS Error (bug): Could not resolve symbol [\_SB.PC00.I2C0.TPD0], AE_NOT_FOUND (20250404/dswload2-162)
+  9月 03 18:48:57 pl kernel: ACPI BIOS Error (bug): Failure creating named object [\_SB.PC00.XHCI.RHUB.SS06._PLD], AE_ALREADY_EXISTS (20250404/dswload2-326)
+  9月 03 18:48:57 pl kernel: ACPI BIOS Error (bug): Failure creating named object [\_SB.PC00.XHCI.RHUB.SS06._UPC], AE_ALREADY_EXISTS (20250404/dswload2-326)
+  9月 03 18:48:57 pl kernel: ACPI BIOS Error (bug): Failure creating named object [\_SB.PC00.XHCI.RHUB.SS05._PLD], AE_ALREADY_EXISTS (20250404/dswload2-326)
+-- 
+2.51.0
+
+</code></pre></div>
+<p>Subject和DCO簽署中間可以寫一些描述，整體結構類似這樣：</p>
+<div class="pre_content"><pre><code>Subject: [PATCH 1/1] [FIX] acpi_log: delete logs related to AE_NOT_FOUND
+
+&lt;變更摘要（不超過 72 字元）&gt;
+
+&lt;詳細說明：背景 → 為何要改 → 方案簡述 → 影響評估&gt;
+
+Fixes: &lt;可選，對應 issue/commit，例如 1a2b3c4d&gt;
+Link: &lt;可選，討論串或報告連結&gt;
+Reported-by: &lt;可選，回報者姓名與信箱&gt;
+Signed-off-by: Texas0295 &lt;texas0295@outlook.com&gt;
+---
+ acpi.log | 4 ----
+ 1 file changed, 4 deletions(-)
+
+</code></pre></div>
+<p>一個標準化的cover letter模板如下：</p>
+<div class="pre_content"><pre><code>From 01fa60fe81a7c5c6dfe640e36bca7c5280c23761 Mon Sep 17 00:00:00 2001
+From: Texas0295 &lt;Texas0295@outlook.com&gt;
+Date: Wed, 3 Sep 2025 20:09:37 +0800
+Subject: [PATCH 0/1] *** SUBJECT HERE ***
+
+*** BLURB HERE ***
+
+Texas0295 (1):
+  [FIX] acpi_log: delete logs related to AE_NOT_FOUND
+
+ acpi.log | 4 ----
+ 1 file changed, 4 deletions(-)
+
+-- 
+2.51.0
+
+</code></pre></div>
+<p>Blurb 通常包含三部分：</p>
+<ol>
+<li>背景：為什麼要改</li>
+<li>改了什麼：總結主要改動</li>
+<li>注意事項：有無影響、是否需要討論</li>
+</ol>
+<p>建好的cover letter需要手動填充需要的資訊</p>
+<p>修改完後很可能長這樣：</p>
+<div class="pre_content"><pre><code>From 01fa60fe81a7c5c6dfe640e36bca7c5280c23761 Mon Sep 17 00:00:00 2001
+From: Texas0295 &lt;Texas0295@outlook.com&gt;
+Date: Wed, 3 Sep 2025 20:09:37 +0800
+Subject: [PATCH v1 0/1] 清理AE_NOT_FOUND日誌
+
+
+在 acpi.log 裡有數條 AE_NOT_FOUND 的日誌輸出，
+這些訊息對日常除錯並無幫助，反而造成噪音。
+
+此補丁刪除了這些 AE_NOT_FOUND 的記錄，
+保留 AE_ALREADY_EXISTS 相關的錯誤訊息。
+
+本修改僅清理輸出，不影響實際 ACPI 行為。
+
+# v2 起需要追加這段
+Changes since v1:
+- &lt;列出與 v1 相比的變更點&gt;
+- &lt;比如補充 commit message、調整範圍、修正格式&gt;
+
+Texas0295 (1):
+  [FIX] acpi_log: delete logs related to AE_NOT_FOUND
+
+ acpi.log | 4 ----
+ 1 file changed, 4 deletions(-)
+
+-- 
+2.51.0
+</code></pre></div>
+<h3 id="傳送patchdtm">傳送 patch（DTM）</h3>
+<p>可以直接傳：</p>
+<div class="pre_content"><pre><code class="language-bash">git send-email *.patch \
+  --to maintainer@example.com
+</code></pre></div>
+<p>亦或先測試（dry-run）：</p>
+<div class="pre_content"><pre><code class="language-bash">git send-email --dry-run *.patch \
+  --to maintainer@example.com
+</code></pre></div>
+<p>有 ML 的情境則改為 <code>--to ml@example.org --cc maintainer@example.com</code>。</p>
+<hr />
+<p class="license">
+  如無特殊說明，所有內容採用
+  <a
+    href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
+    target="_blank"
+    rel="license noopener noreferrer"
+    style="display: inline-block"
+  >CC BY 4.0</a> 協議共享
+</p>
+<p class="post-date">於 2025-09-03 (臺北標準時)</p>
+</article>
+</main>
+</body>
+</html>
