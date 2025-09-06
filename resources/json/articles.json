@@ -93,5 +93,10 @@
     "title": "git format-patch 與 send-email：郵件驅動的去平臺化協作入門",
     "file": "20250903205542.html",
     "date": "2025-09-03"
+  },
+  {
+    "title": "使用patatt給補丁檔案進行密碼學簽名及驗證",
+    "file": "20250906170022.html",
+    "date": "2025-09-06"
   }
 ]
