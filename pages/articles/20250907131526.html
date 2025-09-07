@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PGP與密碼學式信任：Just Trust Math - Texas0295's blog</title>
+    <meta name="description" content="Texas0295的個人部落格" />
+    <meta http-equiv="content-language" content="zh-hant" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta theme-color="#000000" />
+    <meta name="renderer" content="webkit" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/resources/css/article.css?v=1.1"
+    />
+    <script src="/resources/js/highlight.min.js"></script>
+    <script src="/resources/js/add_code_copy_button.js" defer></script>
+    <script src="/resources/js/add_navigation_bar.js"></script>
+    <script src="/resources/js/add_toc.js"></script>
+    <script>
+        const darkmode = localStorage.getItem("darkmode") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "active" : "disabled");
+        document.documentElement.setAttribute("data-theme", darkmode === "active" ? "dark" : "light");
+        localStorage.setItem("darkmode", darkmode);
+    </script>
+    <script>
+        window.addEventListener('load', () => {
+        const toc = document.querySelector('.toc-container');
+        if (window.innerWidth <= 1023 && toc) {
+            toc.classList.remove('expanded');
+            toc.classList.add('collapsed');
+        }
+        });
+    </script>
+  </head>
+  <body>
+    <header>
+      <button id="theme-switch">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z"
+          />
+        </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z"
+          />
+        </svg>
+      </button>
+    </header>
+    <script src="/resources/js/darkmode.js"></script>
+    <div class="navigation-bar">
+      <a href="/"
+        ><img src="/resources/img/site/info-img.jpg" class="logo"
+      /></a>
+    <nav id="navigation-bar" class="menu"></nav>
+    <button class="toc-toggle-btn" onclick="toggleTOC()">☰</button>
+    </div>
+    <main>
+        <article class="article-content"><div class="toc-container">
+<ul class="toc">
+<li class="toc-level-1"><a href="#pgp與密碼學式信任justtrustmath">PGP與密碼學式信任：Just Trust Math</a></li>
+<li class="toc-level-2"><a href="#爲何pgp">爲何PGP</a></li>
+<li class="toc-level-2"><a href="#pgp如何有效">PGP如何有效</a></li>
+<li class="toc-level-3"><a href="#對稱式加密">對稱式加密</a></li>
+<li class="toc-level-3"><a href="#非對稱式加密">非對稱式加密</a></li>
+<li class="toc-level-4"><a href="#原理">原理</a></li>
+</ul>
+</div>
+
+<h1 id="pgp與密碼學式信任justtrustmath">PGP與密碼學式信任：Just Trust Math</h1>
+<p>PGP（Pretty Good Privacy） 是由小菲利普·R·齊默爾曼(Philip R. Zimmermann, Jr.，中文譯名取自維基百科) 於1991年開發並免費分發的商業應用程式</p>
+<p>其開源同類工具爲GnuPG(GPG, GNU Privacy Guard, 1999年9月7日首次釋出)</p>
+<p>下文若無特指，默認原理解釋部分爲PGP，實作操作部分爲GPG</p>
+<h2 id="爲何pgp">爲何PGP</h2>
+<p>在網路上，我們經常會與某些完全陌生的人交換資訊。電郵，檔案，補丁，諸如此類</p>
+<p>若這些資訊直接透過明文傳輸，很容易在某個不具名的伺服器節點遭到篡改（<a href="https://en.wikipedia.org/wiki/Man-in-the-middle_attack">中間人攻擊-維基百科</a>）。</p>
+<p>故當我們在網路上下載一份公開檔案（或從他人那裏收到一份檔案）時，若非無條件信任所有檔案，通常需要回答下列兩個問題：</p>
+<ul>
+<li>這東西誰傳過來的（身份驗證）</li>
+<li>內容是否完整（完整性）</li>
+</ul>
+<p>很多網站會在資源發佈的時候同時公佈這個資源的哈希，這就是用來回答「內容是否完整的」一種通用方式</p>
+<p>當然如果連資源發佈頁都被駭客劫持了那大概率那個哈希值也會被篡改</p>
+<p>傳統信任的來源無非有三：</p>
+<ul>
+<li>社會關係（我認識這人，他傳過來的東西大概率沒問題）</li>
+<li>面對面覈實（「你承認這是你的檔案了？」）</li>
+<li>某個權威第三方機構（也就是CA，Certificate Authority)</li>
+</ul>
+<p>而PGP用非對稱式密碼學原理提供了一個「去中心化」的信任網路，讓某個完全陌生的人能藉由金鑰簽署不斷累計公信力，最終達到「一鑰知人」的境界</p>
+<p>信任網路我會放在另一篇，目前我們先關注核心機制</p>
+<h2 id="pgp如何有效">PGP如何有效</h2>
+<p>PGP 主要對兩種加密方式進行的實作，對稱式加密和非對稱式加密</p>
+<h3 id="對稱式加密">對稱式加密</h3>
+<p>對稱式加密比較簡單，用戶自訂一個祕密金鑰（非技術社群在這裏更通用的汎稱是「密碼」）來加密一個檔案，並將其和祕密金鑰一齊提供給目標用戶，目標用戶再使用同一把金鑰進行解密</p>
+<p>這種加密形式的弱勢也很明顯。無法保證祕密金鑰能安全唯一的傳輸給被信任的另一方。</p>
+<h3 id="非對稱式加密">非對稱式加密</h3>
+<p>而非對稱式加密透過「公/私金鑰」解決了這個限制。它需要兩個金鑰，一個是公開金鑰，另一個是私有金鑰</p>
+<p>公鑰用作加密，私鑰則用作解密。使用公鑰把明文加密後所得的密文，只能用相對應的私鑰才能解密並得到原本的明文，最初用來加密的公鑰不能用作解密</p>
+<p>由於加密和解密需要兩個不同的金鑰，故公鑰可以公開，任意向外發佈</p>
+<p>私鑰則不透過任何途徑向任何人提供，也不會透露給被信任的要通訊的另一方</p>
+<h4 id="原理">原理</h4>
+<p>在數學上，'d(c(x))=x'，我們可以用經典「Alice和Bob」假設來解釋：</p>
+<ol>
+<li>alice與bob事先互不認識，也沒有可靠安全的溝通管道，但alice現在興致來了，想要透過不安全的網際網路向bob傳送資訊</li>
+<li>alice撰寫好原文，其未加密的狀態下稱之為明文<code>x</code></li>
+<li>bob這邊則使用密碼學安全的偽亂數生成器產生一對金鑰，其中一個作為公鑰為<code>c</code>，另一個作為私鑰<code>d</code></li>
+<li>bob可以用任何方法傳送公鑰<code>c</code>給alice，即使Yves（竊聽者）在中間竊聽到<code>c</code>也沒問題</li>
+<li>alice用公鑰<code>c</code>把明文<code>x</code>進行加密，得到密文<code>c(x)</code></li>
+<li>alice可以用任何方法傳輸密文<code>c(x)</code>給bob，哪怕Yves在中間竊聽到密文<code>c(x)</code>也沒問題</li>
+<li>bob收到密文，用私鑰<code>d</code>對密文進行解密<code>d(c(x))</code>，得到alice撰寫的明文x</li>
+<li>由於Yves沒有得到bob的私鑰<code>d</code>所以無法得知明文<code>x</code></li>
+<li>如果alice遺失了她自己撰寫的原文<code>x</code>，在沒有得到bob的私鑰<code>d</code>的情況下，她的情況將等同Yves，即無法透過bob的公鑰<code>c</code>和密文<code>c(x)</code>重新得到原文<code>x</code></li>
+</ol>
+<hr />
+<p class="license">
+  如無特殊說明，所有內容採用
+  <a
+    href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
+    target="_blank"
+    rel="license noopener noreferrer"
+    style="display: inline-block"
+  >CC BY 4.0</a> 協議共享
+</p>
+<p class="post-date">於 2025-09-07 (臺北標準時)</p>
+</article>
+</main>
+</body>
+</html>
