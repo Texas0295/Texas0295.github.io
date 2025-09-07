@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PGP與密碼學式信任：信任網路（Web of Trust, WoT) - Texas0295's blog</title>
+    <meta name="description" content="Texas0295的個人部落格" />
+    <meta http-equiv="content-language" content="zh-hant" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta theme-color="#000000" />
+    <meta name="renderer" content="webkit" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/resources/css/article.css?v=1.1"
+    />
+    <script src="/resources/js/highlight.min.js"></script>
+    <script src="/resources/js/add_code_copy_button.js" defer></script>
+    <script src="/resources/js/add_navigation_bar.js"></script>
+    <script src="/resources/js/add_toc.js"></script>
+    <script>
+        const darkmode = localStorage.getItem("darkmode") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "active" : "disabled");
+        document.documentElement.setAttribute("data-theme", darkmode === "active" ? "dark" : "light");
+        localStorage.setItem("darkmode", darkmode);
+    </script>
+    <script>
+        window.addEventListener('load', () => {
+        const toc = document.querySelector('.toc-container');
+        if (window.innerWidth <= 1023 && toc) {
+            toc.classList.remove('expanded');
+            toc.classList.add('collapsed');
+        }
+        });
+    </script>
+  </head>
+  <body>
+    <header>
+      <button id="theme-switch">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z"
+          />
+        </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z"
+          />
+        </svg>
+      </button>
+    </header>
+    <script src="/resources/js/darkmode.js"></script>
+    <div class="navigation-bar">
+      <a href="/"
+        ><img src="/resources/img/site/info-img.jpg" class="logo"
+      /></a>
+    <nav id="navigation-bar" class="menu"></nav>
+    <button class="toc-toggle-btn" onclick="toggleTOC()">☰</button>
+    </div>
+    <main>
+        <article class="article-content"><div class="toc-container">
+<ul class="toc">
+<li class="toc-level-1"><a href="#pgp與密碼學式信任信任網路weboftrustwot">PGP與密碼學式信任：信任網路（Web of Trust, WoT)</a></li>
+<li class="toc-level-2"><a href="#提出">提出</a></li>
+<li class="toc-level-2"><a href="#原理">原理：</a></li>
+<li class="toc-level-3"><a href="#1公鑰簽名與信任對象">1. 公鑰、簽名與信任對象</a></li>
+<li class="toc-level-3"><a href="#2去中心化的引薦">2. 去中心化的引薦</a></li>
+<li class="toc-level-3"><a href="#3信任路徑與累積機制">3. 信任路徑與累積機制</a></li>
+<li class="toc-level-3"><a href="#4信任度等級與投票邏輯">4. 信任度等級與投票邏輯</a></li>
+<li class="toc-level-3"><a href="#5信任計算流程">5. 信任計算流程</a></li>
+<li class="toc-level-2"><a href="#落地以gnupg爲例">落地（以GnuPG爲例）</a></li>
+<li class="toc-level-3"><a href="#第一行信任計算門檻">第一行：信任計算門檻</a></li>
+<li class="toc-level-3"><a href="#第二行當前信任狀態摘要">第二行：當前信任狀態摘要</a></li>
+<li class="toc-level-2"><a href="#可重現實驗觀察投票門檻">可重現實驗：觀察投票門檻</a></li>
+<li class="toc-level-4"><a href="#1建立主鑰">1. 建立主鑰</a></li>
+<li class="toc-level-4"><a href="#2建立三把引薦者鑰">2. 建立三把「引薦者」鑰</a></li>
+<li class="toc-level-4"><a href="#3匯入一把陌生鑰目標鑰">3. 匯入一把陌生鑰（目標鑰）</a></li>
+<li class="toc-level-4"><a href="#4設定引薦者的ownertrust">4. 設定引薦者的 ownertrust</a></li>
+<li class="toc-level-4"><a href="#5讓引薦者替目標鑰簽名">5. 讓引薦者替目標鑰簽名</a></li>
+<li class="toc-level-4"><a href="#6重新計算trustdb並觀察">6. 重新計算 trustdb 並觀察</a></li>
+<li class="toc-level-2"><a href="#wot的落地限制及相關問題">WoT的落地限制及相關問題</a></li>
+</ul>
+</div>
+
+<h1 id="pgp與密碼學式信任信任網路weboftrustwot">PGP與密碼學式信任：信任網路（Web of Trust, WoT)</h1>
+<h2 id="提出">提出</h2>
+<p>信任網路的概念最早由PGP作者<a href="https://en.wikipedia.org/wiki/Phil_Zimmermann">小菲利普·R·齊默爾曼</a>在PGP 2.0的使用手冊內提出：</p>
+<blockquote>
+<p>隨著時間的流逝，你會逐漸收集許多其他人的密鑰，你可能會將其中其中一些人視作受信任的介紹者。
+而其他人也會選擇他們自己信任的介紹者。
+每個人都會逐漸收集並使用他們的密鑰分發來自其他人的驗證簽名集合，期望任何接收它的人都會信任至少一兩個簽名。
+這將導致所有公鑰的去中心化容錯信任網絡的湧現。</p>
+</blockquote>
+<h2 id="原理">原理：</h2>
+<h3 id="1公鑰簽名與信任對象">1. 公鑰、簽名與信任對象</h3>
+<p>PGP的<strong>信任對象</strong>分兩種：</p>
+<ol>
+<li><strong>鑰匙本人</strong>（您相信這個鑰確實是他的）</li>
+<li><strong>引薦者</strong>（您相信他替別人鑰匙簽名前會認真驗證）</li>
+</ol>
+<h3 id="2去中心化的引薦">2. 去中心化的引薦</h3>
+<p>與 X.509 憑證系統由 CA（憑證授權中心）統一簽發不同，PGP 讓用戶之間彼此簽名、互相引薦
+如果 A 驗證並簽了 B 的鑰匙，A 對 B 建立了直接信任；
+若 B 再簽了 C 的鑰匙，那 A 有機會透過信任 B 的引薦來間接信任 C
+多個人、鑰匙之間的簽名會形成一張圖狀結構，即所謂「信任網路」</p>
+<h3 id="3信任路徑與累積機制">3. 信任路徑與累積機制</h3>
+<p>在這張網路裡，您與另一個鑰匙持有人之間可能存在一條或多條「信任路徑」（trust path）</p>
+<ul>
+<li>一條路徑由一連串簽名構成，每個簽名節點是被你設定過引薦信任度的人</li>
+<li>系統會檢查路徑上所有節點的信任度，並根據預設規則計算這條路徑的有效性</li>
+</ul>
+<h3 id="4信任度等級與投票邏輯">4. 信任度等級與投票邏輯</h3>
+<p>GnuPG 將引薦信任度分為幾檔（例如 full、marginal、none）：</p>
+<ul>
+<li><strong>Full trust</strong>：這個人簽的鑰匙於您而言完全信任</li>
+<li><strong>Marginal trust</strong>：這個人簽的鑰匙可信度有限</li>
+<li><strong>None/Never</strong>：不信任其簽名</li>
+</ul>
+<p>驗證一把陌生鑰匙時，系統會彙總所有可用的信任路徑：</p>
+<ul>
+<li>一條 full 信任路徑即可通過驗證</li>
+<li>多條 marginal 路徑可以累積成一條 full 路徑的效果</li>
+</ul>
+<p>這其實是一個<strong>投票機制</strong>：不同信任度的簽名等於不同權重的票，達到門檻票數即為有效</p>
+<h3 id="5信任計算流程">5. 信任計算流程</h3>
+<p>當您打算用某把陌生公鑰時，系統會：</p>
+<ol>
+<li>檢查是否直接簽過它（直接信任）</li>
+<li>搜索從自己的鑰匙出發到它的所有信任路徑</li>
+<li>按信任度規則為每條路徑計票</li>
+<li>如果累積票數達到預設門檻，該鑰匙狀態標為「有效」（valid）</li>
+</ol>
+<p>這個過程完全由本地的 PGP 實作完成，不依賴外部服務</p>
+<h2 id="落地以gnupg爲例">落地（以GnuPG爲例）</h2>
+<p>當檢查本機信任資料庫時，GPG通常會給出這樣一段輸出：</p>
+<div class="pre_content"><pre><code class="language-bash">~ &gt; gpg --check-trustdb
+gpg: marginals needed: 3  completes needed: 1  trust model: pgp
+gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
+~ &gt;
+</code></pre></div>
+<h3 id="第一行信任計算門檻">第一行：信任計算門檻</h3>
+<ul>
+<li><strong>marginals needed: 3</strong>
+系統需要至少 3 條 <strong>有限信任（marginal）</strong> 路徑，才能將一把鑰匙判為有效</li>
+<li><strong>completes needed: 1</strong>
+有 1 條 <strong>完全信任（full）</strong> 路徑就能直接通過驗證</li>
+<li><strong>trust model: pgp</strong>
+表示當前採用 PGP Web of Trust 模型計算信任</li>
+</ul>
+<h3 id="第二行當前信任狀態摘要">第二行：當前信任狀態摘要</h3>
+<ul>
+<li>
+<p><strong>depth: 0</strong>
+顯示的這層是從自己出發（深度 0 的節點）</p>
+</li>
+<li>
+<p><strong>valid: 1</strong>
+當前有 1 把被認定為有效的鑰匙（通常是自己的）</p>
+</li>
+<li>
+<p><strong>signed: 0</strong>
+目前還沒有為其他鑰匙簽名（沒有建立外向引薦）</p>
+</li>
+<li>
+<p><strong>trust: 0-, 0q, 0n, 0m, 0f, 1u</strong>
+各信任等級的鑰匙數量：</p>
+<ul>
+<li><code>-</code> 未知（unknown）</li>
+<li><code>q</code> 詢問（query）</li>
+<li><code>n</code> 不信任（none）</li>
+<li><code>m</code> 有限信任（marginal）</li>
+<li><code>f</code> 完全信任（full）</li>
+<li><code>u</code> <strong>最終信任（ultimate）</strong> —— 一般只給自己</li>
+</ul>
+</li>
+</ul>
+<p>這段輸出也對應前面的投票邏輯：</p>
+<ol>
+<li><strong>一票通過</strong>：1 條 full 路徑</li>
+<li><strong>三票累積</strong>：3 條 marginal 路徑</li>
+<li>票數不足 → 該鑰匙不會被標記為 <code>valid</code></li>
+</ol>
+<h2 id="可重現實驗觀察投票門檻">可重現實驗：觀察投票門檻</h2>
+<p><strong>前置</strong></p>
+<ul>
+<li>一台乾淨的 GnuPG 環境（或新建一個測試用戶目錄）</li>
+<li>GnuPG 版本 ≥ 2.2</li>
+</ul>
+<h4 id="1建立主鑰">1. 建立主鑰</h4>
+<div class="pre_content"><div class="pre_content"><pre><code class="language-bash">gpg --full-generate-key
+</code></pre></div></div>
+<p>生成後，這把鑰會自動被標記為 <strong>ultimate trust</strong>。</p>
+<h4 id="2建立三把引薦者鑰">2. 建立三把「引薦者」鑰</h4>
+<p>為了模擬不同簽名者，需要再生成三把獨立的測試鑰（名稱可爲 <code>Signer1</code>、<code>Signer2</code>、<code>Signer3</code>）：</p>
+<div class="pre_content"><pre><code class="language-bash">gpg --full-generate-key
+# 重複三次
+</code></pre></div>
+<h4 id="3匯入一把陌生鑰目標鑰">3. 匯入一把陌生鑰（目標鑰）</h4>
+<p>從 keyserver 匯入任何一把公開鑰，或再生成一把「Target」測試鑰：</p>
+<div class="pre_content"><div class="pre_content"><pre><code class="language-bash">gpg --full-generate-key
+</code></pre></div></div>
+<h4 id="4設定引薦者的ownertrust">4. 設定引薦者的 ownertrust</h4>
+<p>將三個引薦者鑰匙的 ownertrust 設為 <strong>marginal</strong>：</p>
+<div class="pre_content"><pre><code class="language-bash">gpg --edit-key "Signer1"
+trust     # 選擇 3 = marginal
+quit
+# 對 Signer2 / Signer3 重複此步驟
+</code></pre></div>
+<h4 id="5讓引薦者替目標鑰簽名">5. 讓引薦者替目標鑰簽名</h4>
+<div class="pre_content"><pre><code class="language-bash">gpg --edit-key "Target"
+sign      # 用 Signer1 簽
+quit
+# 對 Signer2 / Signer3 重複此步驟
+</code></pre></div>
+<h4 id="6重新計算trustdb並觀察">6. 重新計算 trustdb 並觀察</h4>
+<div class="pre_content"><pre><code class="language-bash">gpg --check-trustdb
+</code></pre></div>
+<p>當三條 marginal 路徑同時存在時，GnuPG 應會將目標鑰標記為 <code>valid</code></p>
+<h2 id="wot的落地限制及相關問題">WoT的落地限制及相關問題</h2>
+<ol>
+<li>新鑰匙的冷啟動問題</li>
+</ol>
+<ul>
+<li>
+<p>沒有中心化 CA，意味著新鑰匙必須靠他人簽名才能進入現有的信任網絡</p>
+</li>
+<li>
+<p>如果使用者不在活躍社群（例如偏遠地區），很難找到可信的人來簽鑰</p>
+</li>
+<li>
+<p>如果幫忙簽名的人自己也是「新鑰匙」，那簽名對其他人的信任計算幫助不大</p>
+</li>
+</ul>
+<ol start="2">
+<li>獲取背書的方式</li>
+</ol>
+<p>主要可以透過三種方式獲得背書：</p>
+<ul>
+<li>
+<p>密鑰簽名派對（Key Signing Party）：大家面對面核對身份、交換指紋後互簽</p>
+</li>
+<li>
+<p>線上協作平台：例如 Gossamer Spider Web of Trust（GSWoT）</p>
+</li>
+<li>
+<p>明確信任某個頂級鑰匙，讓它作為二級引薦者，降低鏈長度</p>
+</li>
+</ul>
+<ol start="3">
+<li>信任鏈，「小世界現象」</li>
+</ol>
+<p>從圖論的角度，多數人之間存在一條短的信任鏈</p>
+<p>但短鏈不一定有效：必須鏈上每個人都遵守嚴謹的身份驗證準則，您才會接受該鏈</p>
+<ol start="4">
+<li>面對面驗證的成本問題</li>
+</ol>
+<p>需要實地見面，對於地理分散的人來說成本高（差旅、時間安排）</p>
+<p>在開源軟體場景下，數千開發者的鑰匙幾乎不可能都直接驗證，只能依賴間接信任傳播</p>
+<ol start="5">
+<li>第三方公鑰伺服器</li>
+</ol>
+<ul>
+<li>公鑰伺服器是第三方，可能遭到濫用或攻擊</li>
+</ul>
+<p>要改進這個信任問題，可以在自己的域名下架設密鑰伺服器</p>
+<p>或者使用 HKPS（HTTPS 的密鑰伺服器版本）來安全傳輸公鑰</p>
+<hr />
+<p class="license">
+  如無特殊說明，所有內容採用
+  <a
+    href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
+    target="_blank"
+    rel="license noopener noreferrer"
+    style="display: inline-block"
+  >CC BY 4.0</a> 協議共享
+</p>
+<p class="post-date">於 2025-09-08 (臺北標準時)</p>
+</article>
+</main>
+</body>
+</html>
