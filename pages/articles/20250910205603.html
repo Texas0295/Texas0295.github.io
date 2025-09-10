@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Old-fashioned : Contribute a modern git repo like a republican (via svn) - Texas0295's blog</title>
+    <meta name="description" content="Texas0295的個人部落格" />
+    <meta http-equiv="content-language" content="zh-hant" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta theme-color="#000000" />
+    <meta name="renderer" content="webkit" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/resources/css/article.css?v=1.1"
+    />
+    <script src="/resources/js/highlight.min.js"></script>
+    <script src="/resources/js/add_code_copy_button.js" defer></script>
+    <script src="/resources/js/add_navigation_bar.js"></script>
+    <script src="/resources/js/add_toc.js"></script>
+    <script>
+        const darkmode = localStorage.getItem("darkmode") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "active" : "disabled");
+        document.documentElement.setAttribute("data-theme", darkmode === "active" ? "dark" : "light");
+        localStorage.setItem("darkmode", darkmode);
+    </script>
+    <script>
+        window.addEventListener('load', () => {
+        const toc = document.querySelector('.toc-container');
+        if (window.innerWidth <= 1023 && toc) {
+            toc.classList.remove('expanded');
+            toc.classList.add('collapsed');
+        }
+        });
+    </script>
+  </head>
+  <body>
+    <header>
+      <button id="theme-switch">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z"
+          />
+        </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z"
+          />
+        </svg>
+      </button>
+    </header>
+    <script src="/resources/js/darkmode.js"></script>
+    <div class="navigation-bar">
+      <a href="/"
+        ><img src="/resources/img/site/info-img.jpg" class="logo"
+      /></a>
+    <nav id="navigation-bar" class="menu"></nav>
+    <button class="toc-toggle-btn" onclick="toggleTOC()">☰</button>
+    </div>
+    <main>
+        <article class="article-content"><div class="toc-container">
+<ul class="toc">
+<li class="toc-level-1"><a href="#oldfashionedcontributeamoderngitrepolikearepublicanviasvn">Old-fashioned : Contribute a modern git repo like a republican (via svn)</a></li>
+<li class="toc-level-2"><a href="#動機">動機</a></li>
+<li class="toc-level-2"><a href="#整體架構">整體架構</a></li>
+<li class="toc-level-2"><a href="#準備工作">準備工作</a></li>
+<li class="toc-level-2"><a href="#configyml範例">config.yml 範例</a></li>
+<li class="toc-level-2"><a href="#systemduser服務">systemd --user 服務</a></li>
+<li class="toc-level-2"><a href="#gitattributes">.gitattributes</a></li>
+<li class="toc-level-2"><a href="#svn用法">SVN 用法</a></li>
+<li class="toc-level-2"><a href="#推回github">推回 GitHub</a></li>
+<li class="toc-level-3"><a href="#手動">手動</a></li>
+<li class="toc-level-3"><a href="#自動">自動</a></li>
+<li class="toc-level-2"><a href="#注意事項">注意事項</a></li>
+<li class="toc-level-2"><a href="#附錄svngit對照表">附錄： SVN ↔ Git 對照表</a></li>
+</ul>
+</div>
+
+<h1 id="oldfashionedcontributeamoderngitrepolikearepublicanviasvn">Old-fashioned : Contribute a modern git repo like a republican (via svn)</h1>
+<h2 id="動機">動機</h2>
+<p>Q: 這是在幹什麼？就不能讓我用正常的<code>git push</code>嗎？</p>
+<p>A: 現代開源專案幾乎全面 Git 化，GitHub 也在 2024 年移除了原生 SVN 支援。但透過 <strong>git-as-svn</strong> 這類橋接工具，仍然可以用 SVN 客戶端參與一個現代 Git 倉庫的開發</p>
+<p>這種做法適合的人群：</p>
+<ul>
+<li>想體驗集中式工作流（老派 CVS/SVN 風格）</li>
+<li>想用 CLI / vi / minimal setup 開發現代專案</li>
+<li>共和黨人，德州牛仔</li>
+</ul>
+<h2 id="整體架構">整體架構</h2>
+<div class="pre_content"><pre><code>SVN client  ⇄  git-as-svn  ⇄  本地裸 Git 倉庫  ⇄  (push)  ⇄  GitHub
+</code></pre></div>
+<ul>
+<li><strong>SVN client</strong>：日常開發工具</li>
+<li><strong>git-as-svn</strong>：代理，將 SVN 操作轉換為 Git 操作</li>
+<li><strong>本地裸 Git 倉庫</strong>：同步中樞，保存完整 Git refs</li>
+<li><strong>GitHub</strong>：最終上游 Git 倉庫</li>
+</ul>
+<h2 id="準備工作">準備工作</h2>
+<p>安裝：</p>
+<div class="pre_content"><pre><code class="language-bash">sudo pacman -S svn git
+</code></pre></div>
+<p>對於<code>Debian/Ubuntu</code>用戶，可以透過包管理安裝<code>git-as-svn</code></p>
+<p>其他發行版用戶請訪問<a href="https://github.com/git-as-svn/git-as-svn">Github 專案</a></p>
+<p>建立裸倉庫：</p>
+<div class="pre_content"><pre><code class="language-bash">mkdir -p ~/srv/git/repositories
+git clone --mirror git@github.com:&lt;you&gt;/&lt;repo&gt;.git \
+  ~/srv/git/repositories/&lt;repo&gt;.git
+</code></pre></div>
+<p>設定簽名：</p>
+<div class="pre_content"><pre><code class="language-bash">git -C ~/srv/git/repositories/&lt;repo&gt;.git config commit.gpgSign true
+git -C ~/srv/git/repositories/&lt;repo&gt;.git config user.name "名字"
+git -C ~/srv/git/repositories/&lt;repo&gt;.git config user.email "郵件"
+git -C ~/srv/git/repositories/&lt;repo&gt;.git config user.signingkey &lt;KEYID&gt;
+</code></pre></div>
+<h2 id="configyml範例">config.yml 範例</h2>
+<p><code>~/.config/git-as-svn/config.yml</code>：</p>
+<div class="pre_content"><pre><code class="language-yaml">!config:
+  host: 127.0.0.1
+  port: 3690
+
+  cacheConfig: !persistentCache
+    path: ~/.local/share/git-as-svn/git-as-svn.mapdb
+
+  repositoryMapping: !listMapping
+    repositories:
+      &lt;repo&gt;:
+        access:
+          /: { "*": rw }
+        repository:
+          createMode: ERROR
+          branches: [ main ]
+          path: ~/srv/git/repositories/&lt;repo&gt;.git
+          renameDetection: true
+          format: Latest
+      &lt;repo2&gt;:
+        access:
+          /: { "*": rw }
+        repository:
+          createMode: ERROR
+          branches: [ master ]
+          path: ~/srv/git/repositories/&lt;repo2&gt;.git
+          renameDetection: true
+          format: Latest
+
+  shared: []
+</code></pre></div>
+<h2 id="systemduser服務">systemd --user 服務</h2>
+<p><code>~/.config/systemd/user/git-as-svn.service</code>：</p>
+<div class="pre_content"><pre><code class="language-ini">[Unit]
+Description=git-as-svn (SVN facade for Git repos)
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/git-as-svn -c %h/.config/git-as-svn/config.yml
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+</code></pre></div>
+<p>啟用：</p>
+<div class="pre_content"><pre><code class="language-bash">systemctl --user daemon-reload
+systemctl --user enable --now git-as-svn
+# 如需開機自動啟動：
+loginctl enable-linger "$USER"
+</code></pre></div>
+<h2 id="gitattributes">.gitattributes</h2>
+<p>爲了協同行尾格式避免假更動，需要設定<code>.gitattributes</code>：</p>
+<div class="pre_content"><pre><code class="language-bash">git config --global core.attributesFile ~/.config/git/attributes
+mkdir ~/.config/git
+echo '* -text' &gt; ~/.config/git/attributes
+</code></pre></div>
+<h2 id="svn用法">SVN 用法</h2>
+<p>檢出：</p>
+<div class="pre_content"><pre><code class="language-bash">svn checkout svn://127.0.0.1/&lt;repo&gt;/main my-working-copy
+cd my-working-copy
+</code></pre></div>
+<p>更新：</p>
+<div class="pre_content"><pre><code class="language-bash">svn update
+</code></pre></div>
+<p>查看狀態：</p>
+<div class="pre_content"><pre><code class="language-bash">svn status
+</code></pre></div>
+<p>新增 / 刪除檔案：</p>
+<div class="pre_content"><pre><code class="language-bash">svn add newfile.dart
+svn delete oldfile.dart
+</code></pre></div>
+<p>查看差異：</p>
+<div class="pre_content"><pre><code class="language-bash">svn diff
+</code></pre></div>
+<p>提交：</p>
+<div class="pre_content"><pre><code class="language-bash">svn commit -m "Fix: 修正 XXX 問題"
+</code></pre></div>
+<p>還原：</p>
+<div class="pre_content"><pre><code class="language-bash">svn revert file.dart
+</code></pre></div>
+<p>查看歷史：</p>
+<div class="pre_content"><pre><code class="language-bash">svn log
+</code></pre></div>
+<h2 id="推回github">推回 GitHub</h2>
+<h3 id="手動">手動</h3>
+<div class="pre_content"><pre><code class="language-bash">git -C ~/srv/git/repositories/&lt;repo&gt;.git push --mirror
+</code></pre></div>
+<h3 id="自動">自動</h3>
+<p>建立<code>git-mirror-push-all.sh</code>：</p>
+<div class="pre_content"><pre><code class="language-bash">#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="$HOME/srv/git/repositories"
+
+REMOTE_NAME="origin"
+
+shopt -s nullglob
+for repo in "$REPO_ROOT"/*; do
+  printf '[mirror] %s\n' "$repo"
+  git -C "$repo" push --mirror "$REMOTE_NAME"
+done
+</code></pre></div>
+<h2 id="注意事項">注意事項</h2>
+<ul>
+<li>分支必須在 <code>branches:</code> 中顯式列出，且名稱必須與 Git 真實分支一致</li>
+<li><code>.gitattributes</code> 建議統一行尾，避免 SVN ↔ Git diff 混亂</li>
+<li>GitHub 已移除原生 SVN 協議，必須使用橋接</li>
+<li>確保裸倉庫中已設定 GPG 簽名，以便 GitHub 顯示 Verified</li>
+</ul>
+<h2 id="附錄svngit對照表">附錄： SVN ↔ Git 對照表</h2>
+<table><thead><tr><th>Git 操作</th><th>SVN 等效</th><th>說明</th></tr></thead><tbody>
+<tr><td><code>git clone &lt;url&gt;</code></td><td><code>svn checkout svn://&lt;host&gt;/&lt;repo&gt;/&lt;branch&gt;</code></td><td>取出指定分支作為工作副本；SVN 沒有一次性全分支 clone，分支是目錄</td></tr>
+<tr><td><code>git pull</code></td><td><code>svn update</code></td><td>從伺服器同步最新修改到本地工作副本</td></tr>
+<tr><td><code>git add file</code></td><td><code>svn add file</code></td><td>將新檔案加入版本控制</td></tr>
+<tr><td><code>git rm file</code></td><td><code>svn delete file</code></td><td>刪除檔案並標記到版本控制</td></tr>
+<tr><td><code>git mv old new</code></td><td><code>svn move old new</code></td><td>重命名或移動檔案</td></tr>
+<tr><td><code>git diff</code></td><td><code>svn diff</code></td><td>查看工作副本與伺服器最新版本的差異</td></tr>
+<tr><td><code>git log</code></td><td><code>svn log</code></td><td>查看提交歷史</td></tr>
+<tr><td><code>git commit -m "msg"</code></td><td><code>svn commit -m "msg"</code></td><td>提交變更到伺服器（橋接後即為 Git commit）</td></tr>
+<tr><td><code>git checkout -- file</code></td><td><code>svn revert file</code></td><td>放棄對某檔案的修改</td></tr>
+<tr><td><code>git reset --hard</code></td><td><code>svn revert -R .</code></td><td>放棄對整個工作副本的修改</td></tr>
+<tr><td><code>git branch &lt;name&gt;</code></td><td><code>svn copy &lt;repo&gt;/&lt;branch&gt; &lt;repo&gt;/&lt;newbranch&gt; -m "create branch"</code></td><td>建立新分支（在伺服器上創建目錄）</td></tr>
+<tr><td><code>git checkout &lt;branch&gt;</code></td><td><code>svn switch ^/&lt;repo&gt;/&lt;branch&gt;</code></td><td>切換到另一個分支</td></tr>
+<tr><td><code>git merge &lt;branch&gt;</code></td><td><code>svn merge ^/&lt;repo&gt;/&lt;branch&gt;</code></td><td>將另一分支合併到當前工作副本</td></tr>
+<tr><td><code>git tag &lt;tag&gt;</code></td><td><code>svn copy &lt;repo&gt;/&lt;branch&gt; &lt;repo&gt;/tags/&lt;tag&gt; -m "tag release"</code></td><td>建立標籤（其實是目錄複製）</td></tr>
+<tr><td><code>git show &lt;tag&gt;</code></td><td><code>svn log &lt;repo&gt;/tags/&lt;tag&gt;</code></td><td>查看標籤的提交資訊</td></tr>
+<tr><td><code>git fetch</code></td><td>無直接對應</td><td>SVN 沒有 fetch，update 就會直接更新本地</td></tr>
+<tr><td><code>git push</code></td><td>無直接對應</td><td>SVN commit 就是 push（集中式）</td></tr>
+</tbody></table>
+<hr />
+<p class="license">
+  如無特殊說明，所有內容採用
+  <a
+    href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
+    target="_blank"
+    rel="license noopener noreferrer"
+    style="display: inline-block"
+  >CC BY 4.0</a> 協議共享
+</p>
+<p class="post-date">於 2025-09-10 (臺北標準時)</p>
+</article>
+</main>
+</body>
+</html>
