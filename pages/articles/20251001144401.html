@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>在Arch Linux VPS上設定SVN伺服器 - Texas0295's blog</title>
+    <meta name="description" content="Texas0295的個人部落格" />
+    <meta http-equiv="content-language" content="zh-hant" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta theme-color="#000000" />
+    <meta name="renderer" content="webkit" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/resources/css/article.css?v=1.1"
+    />
+    <script src="/resources/js/highlight.min.js"></script>
+    <script src="/resources/js/add_code_copy_button.js" defer></script>
+    <script src="/resources/js/add_navigation_bar.js"></script>
+    <script src="/resources/js/add_toc.js"></script>
+    <script>
+        const darkmode = localStorage.getItem("darkmode") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "active" : "disabled");
+        document.documentElement.setAttribute("data-theme", darkmode === "active" ? "dark" : "light");
+        localStorage.setItem("darkmode", darkmode);
+    </script>
+    <script>
+        window.addEventListener('load', () => {
+        const toc = document.querySelector('.toc-container');
+        if (window.innerWidth <= 1023 && toc) {
+            toc.classList.remove('expanded');
+            toc.classList.add('collapsed');
+        }
+        });
+    </script>
+  </head>
+  <body>
+    <header>
+      <button id="theme-switch">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z"
+          />
+        </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z"
+          />
+        </svg>
+      </button>
+    </header>
+    <script src="/resources/js/darkmode.js"></script>
+    <div class="navigation-bar">
+      <a href="/"
+        ><img src="/resources/img/site/info-img.jpg" class="logo"
+      /></a>
+    <nav id="navigation-bar" class="menu"></nav>
+    <button class="toc-toggle-btn" onclick="toggleTOC()">☰</button>
+    </div>
+    <main>
+        <article class="article-content"><div class="toc-container">
+<ul class="toc">
+<li class="toc-level-1"><a href="#在archlinuxvps上設定svn伺服器">在Arch Linux VPS上設定SVN伺服器</a></li>
+<li class="toc-level-2"><a href="#設定">設定</a></li>
+<li class="toc-level-3"><a href="#基本服務">基本服務</a></li>
+<li class="toc-level-3"><a href="#創建及配置專案">創建及配置專案</a></li>
+<li class="toc-level-3"><a href="#注意事項">注意事項</a></li>
+<li class="toc-level-3"><a href="#測試">測試</a></li>
+</ul>
+</div>
+
+<h1 id="在archlinuxvps上設定svn伺服器">在Arch Linux VPS上設定SVN伺服器</h1>
+<p>最近買了一個月供5$的美國伺服器，決定把這個伺服器當作SVN伺服器對待</p>
+<h2 id="設定">設定</h2>
+<h3 id="基本服務">基本服務</h3>
+<p>拿到VPS後用root連上去</p>
+<p>首先是基本的權限分離，創建一個nologin的svn賬戶用以跑svn服務</p>
+<div class="pre_content"><pre><code class="language-bash">useradd -r -s /usr/bin/nologin svn
+</code></pre></div>
+<p>安裝<code>subversion</code>包</p>
+<div class="pre_content"><pre><code class="language-bash">pacman -S subversion
+</code></pre></div>
+<p>然後給svn服務創建一個資料夾，自己一般習慣把對外服務放入<code>/srv</code>內</p>
+<div class="pre_content"><pre><code class="language-bash">mkdir /srv/svn
+mkdir /srv/svn/repositories
+</code></pre></div>
+<p>記得把所有權轉給<code>svn</code>賬戶</p>
+<div class="pre_content"><pre><code class="language-bash">chown -R svn:svn /srv/svn
+</code></pre></div>
+<p>隨後創建<code>/etc/systemd/system/svnserve.service</code>，把伺服器的自啓任務交給systemd處理</p>
+<p>內部寫入如下內容：</p>
+<div class="pre_content"><pre><code class="language-ini">[Unit]
+Description=Subversion server
+After=network.target
+
+[Service]
+Type=forking
+User=svn
+Group=svn
+
+RuntimeDirectory=svnserve
+RuntimeDirectoryMode=0755
+
+ExecStart=/usr/bin/svnserve -d -r /srv/svn/repositories --pid-file=/run/svnserve/svnserve.pid
+PIDFile=/run/svnserve/svnserve.pid
+
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+</code></pre></div>
+<p>記得留一個pidfile給systemd追，不然會被判死</p>
+<p>然後給防火牆開<code>3690</code>端口以供svn對外服務</p>
+<p>這裏以<code>ufw</code>爲例子（其他防火牆也可以，這裏只是因爲VPS預裝了這東西，自己懶得換iptables）</p>
+<div class="pre_content"><pre><code class="language-bash">ufw allow 3690/tcp
+ufw reload
+</code></pre></div>
+<p>隨後刷新一下unit，並讓<code>svnserve</code>開機自啓（並現在啓動）</p>
+<div class="pre_content"><pre><code class="language-bash">systemctl daemon-reload
+systemctl enable --now svnserve
+</code></pre></div>
+<p>按這個流程順下來，svn服務應當能正常啓動</p>
+<h3 id="創建及配置專案">創建及配置專案</h3>
+<p><code>/srv/svn</code>的所有權現在被移到了<code>svn</code>賬戶，所以創建專案的時候要用<code>sudo -u svn</code></p>
+<div class="pre_content"><pre><code class="language-bash">cd /srv/svn/repositories
+sudo -u svn svnadmin create solian-as-irc
+</code></pre></div>
+<p>（選做）svn專案上習慣要創建三個獨立的區域：trunk，branches，tags</p>
+<p>這部分自己習慣上用<code>admin</code>名義</p>
+<div class="pre_content"><pre><code class="language-bash">svn mkdir -m "[INIT] Initialize standard layout" --username admin file:///srv/svn/repositories/solian-as-irc/{trunk,branches,tags}
+</code></pre></div>
+<p>打開專案資料夾下的<code>conf/svnserve.conf</code>，編輯並確保以下這些基礎配置被寫入（相關條目一般以註解方式存在，需要取消註解）</p>
+<div class="pre_content"><pre><code class="language-ini">[general]
+anon-access = read
+auth-access = write
+password-db = passwd
+authz-db = authz
+realm = solian-as-irc
+</code></pre></div>
+<p><code>anon-access</code>控制匿名賬戶的權限，這裏設定成<code>read</code>，故可以無賬戶簽出</p>
+<p><code>auth-access</code>控制認證賬戶的權限，這裏設定成<code>write</code>，故可以認證後寫入</p>
+<p>下面兩個db默認都是同層級的<code>authz</code>，和<code>passwd</code>，稍後會配置這兩個檔案</p>
+<p><code>realm</code>設定成和專案同樣的名字</p>
+<p>然後打開<code>authz</code>，寫入如下內容</p>
+<p>注意權限配置是基於組的</p>
+<div class="pre_content"><pre><code class="language-ini">[aliases]
+
+[groups]
+maintainers = Texas0295
+
+[solian-as-irc:/]
+@maintainers = rw
+$anonymous = r
+</code></pre></div>
+<p>最後打開<code>passwd</code>，保證以下配置被寫入：</p>
+<div class="pre_content"><pre><code class="language-ini">[users]
+Texas0295 = &lt;PASSWORD_HERE&gt;
+</code></pre></div>
+<p>至此伺服器的基本配置已經完成了</p>
+<h3 id="注意事項">注意事項</h3>
+<ul>
+<li>Subversion 的 passwd 檔案為明文儲存，避免使用常用密碼</li>
+<li>如果需要完全私有化，可以將 anon-access 設為 none</li>
+<li>多個 repo 可以放在 /srv/svn/repositories 下，彼此獨立管理，但創建的時候記得使用<code>sudo -u svn</code></li>
+<li>realm 建議設定為專案名，方便區分多個專案的認證提示</li>
+</ul>
+<h3 id="測試">測試</h3>
+<p>用戶端可嘗試匿名讀寫</p>
+<div class="pre_content"><pre><code class="language-bash">svn co svn://&lt;IP_FOR_YOUR_VPS&gt;/solian-as-irc/trunk
+</code></pre></div>
+<p>和認證提交</p>
+<div class="pre_content"><pre><code class="language-bash">svn commit -m "MESSAGE" --username Texas0295
+</code></pre></div>
+<hr />
+<p class="license">
+  如無特殊說明，所有內容採用
+  <a
+    href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
+    target="_blank"
+    rel="license noopener noreferrer"
+    style="display: inline-block"
+  >CC BY 4.0</a> 協議共享
+</p>
+<p class="post-date">於 2025-10-01 (臺北標準時)</p>
+</article>
+</main>
+</body>
+</html>
