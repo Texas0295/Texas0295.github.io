@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>典型Java思維 : 依賴注入與控制反轉在Rust上的慣性實踐 - Texas0295's blog</title>
+    <meta name="description" content="Texas0295的個人部落格" />
+    <meta http-equiv="content-language" content="zh-hant" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta theme-color="#000000" />
+    <meta name="renderer" content="webkit" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/resources/css/article.css?v=1.1"
+    />
+    <script src="/resources/js/highlight.min.js"></script>
+    <script src="/resources/js/add_code_copy_button.js" defer></script>
+    <script src="/resources/js/add_navigation_bar.js"></script>
+    <script src="/resources/js/add_toc.js"></script>
+    <script>
+        const darkmode = localStorage.getItem("darkmode") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "active" : "disabled");
+        document.documentElement.setAttribute("data-theme", darkmode === "active" ? "dark" : "light");
+        localStorage.setItem("darkmode", darkmode);
+    </script>
+    <script>
+        window.addEventListener('load', () => {
+        const toc = document.querySelector('.toc-container');
+        if (window.innerWidth <= 1023 && toc) {
+            toc.classList.remove('expanded');
+            toc.classList.add('collapsed');
+        }
+        });
+    </script>
+  </head>
+  <body>
+    <header>
+      <button id="theme-switch">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z"
+          />
+        </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z"
+          />
+        </svg>
+      </button>
+    </header>
+    <script src="/resources/js/darkmode.js"></script>
+    <div class="navigation-bar">
+      <a href="/"
+        ><img src="/resources/img/site/info-img.jpg" class="logo"
+      /></a>
+    <nav id="navigation-bar" class="menu"></nav>
+    <button class="toc-toggle-btn" onclick="toggleTOC()">☰</button>
+    </div>
+    <main>
+        <article class="article-content"><div class="toc-container">
+<ul class="toc">
+<li class="toc-level-1"><a href="#典型java思維依賴注入與控制反轉在rust上的慣性實踐">典型Java思維 : 依賴注入與控制反轉在Rust上的慣性實踐</a></li>
+<li class="toc-level-2"><a href="#實例ioc容器">實例（IoC容器）</a></li>
+<li class="toc-level-2"><a href="#java視角">Java視角</a></li>
+<li class="toc-level-2"><a href="#rust視角">Rust視角</a></li>
+<li class="toc-level-2"><a href="#結">結</a></li>
+</ul>
+</div>
+
+<h1 id="典型java思維依賴注入與控制反轉在rust上的慣性實踐">典型Java思維 : 依賴注入與控制反轉在Rust上的慣性實踐</h1>
+<blockquote>
+<p>控制反轉將第二權責從對象中拿出來，轉移到另一個專注於此的對象之中，從而遵循
+了單一權責原則。在依賴管理的情境中，對象不應負責實體化對自身的依賴，反之，它
+應當將這份權責移交給其他「有權力」的機制，從而實現控制的反轉。因爲初始設置是
+一種全局問題，所以通常這種授權機制要麼是main例程，要麼是有特定目的的容器。</p>
+<p>-- Robert C. Martin <em>Clean Code : A Hand book of Agile Software Craftsmanship</em></p>
+</blockquote>
+<p>「物件導向語言」的使用者有一個通病，尤其是拜讀了Robert Martin, Martin Fowler這些名家的書籍之後</p>
+<p>兩個概念就被固化在了腦海裏：</p>
+<ol>
+<li>
+<p>依賴反轉（Dependency Inversion Principle, DIP）
+抽象界面永不依賴具體實現，具體實現反而應當依賴抽象界面
+依據這個概念，抽象界面作爲一層中介，使得調用方不需要知道具體的實現即可使用服務</p>
+</li>
+<li>
+<p>控制反轉（Inversion of Control, IoC）
+程式不去控制實例化自己需要的物件，相反，它們必須將這份職責提交給一個「有權力」的機制，讓他們來負責實例化這些東西</p>
+</li>
+</ol>
+<p>而要實現控制反轉進而實現依賴反轉，筆者在這裏示例兩種方法：</p>
+<ol>
+<li>
+<p>依賴注入（Dependency Injection, DI）
+調用方在相關方法簽名上宣告需要的接口類別，並等待main例程（或相關類）「注入」服務</p>
+</li>
+<li>
+<p>IoC容器
+調用方使用已知的型別類型，透過一個中央化的IoC容器「請求」服務</p>
+</li>
+</ol>
+<p>本來是好事，但換了一個語言之後，有點水土不服，就容易寫出一點「典型Java思維」的東西出來</p>
+<h2 id="實例ioc容器">實例（IoC容器）</h2>
+<p>先來看一下這段rust程式碼：</p>
+<div class="pre_content"><pre><code class="language-rust">pub static GLOBAL_LOCATOR: Lazy&lt;ServiceLocator&gt; = Lazy::new(ServiceLocator::new);
+
+pub struct ServiceLocator {
+    services: RwLock&lt;HashMap&lt;TypeId, Box&lt;dyn Any + Send + Sync&gt;&gt;&gt;,
+}
+
+impl ServiceLocator {
+    pub fn new() -&gt; Self {
+        Self {
+            services: RwLock::new(HashMap::new()),
+        }
+    }
+
+    pub fn register&lt;T: ?Sized + Send + Sync + 'static&gt;(&amp;self, svc: Arc&lt;T&gt;) {
+        let mut g = self.services.write().unwrap();
+        g.insert(TypeId::of::&lt;T&gt;(), Box::new(svc));
+    }
+
+    pub fn lookup&lt;T: ?Sized + Send + Sync + 'static&gt;(&amp;self) -&gt; Option&lt;Arc&lt;T&gt;&gt; {
+        let g = self.services.read().unwrap();
+        g.get(&amp;TypeId::of::&lt;T&gt;())
+            .and_then(|boxed| boxed.downcast_ref::&lt;Arc&lt;T&gt;&gt;().cloned())
+    }
+}
+</code></pre></div>
+<p>寫過Java（或廣義OOP語言）的，大概率很快就能看出來這是一個IoC容器</p>
+<p>具體來看：</p>
+<ol>
+<li>
+<p>作爲核心的<code>ServiceLocator</code> 維護一張散列表，其接受任意型別識別符號爲鍵，任意物件爲值</p>
+</li>
+<li>
+<p><code>register</code>方法則接受所有符合 <code>?Sized + Send + Sync + 'static</code>（自然語言而言，這個類線程安全且不帶生命週期依賴）約束的泛型<code>T</code>
+並在形參上進一步要求其經過Arc包裝,透過簽名約束確保註冊物件和宣稱型別的一致性</p>
+</li>
+<li>
+<p><code>lookup</code>方法則以給定的泛型<code>T</code>查表，獲取物件，強制向下轉換，並返回一個<code>Arc&lt;T&gt;</code></p>
+</li>
+</ol>
+<p>實踐而言，調用方的流程就是經典的「拿着接口找服務」：</p>
+<div class="pre_content"><pre><code class="language-rust">let chans = match GLOBAL_LOCATOR.lookup::&lt;dyn ChatMapService&gt;().unwrap();
+
+chans.list_groups().await{
+    Ok(c) =&gt; c,
+    Err(e) =&gt; {
+    eprintln!("[ERROR] Failed to list groups: {e:?}");
+        vec![]
+    }
+};
+</code></pre></div>
+<p>而在另一側的註冊方瞭解具體的服務，它來負責將服務註冊進去：</p>
+<div class="pre_content"><pre><code class="language-rust">pub async fn init_services() -&gt; anyhow::Result&lt;String&gt; {
+    // &lt;...&gt;
+    let chat_maps = Arc::new(ChatMaps::new());
+    GLOBAL_LOCATOR.register::&lt;dyn ChatMapService&gt;(chat_maps);
+    // &lt;...&gt;
+}
+</code></pre></div>
+<p>透過這種方式，調用方無權掌控自己能使用什麼樣的實現，這份控制權已經被移交給了「有權力」的機制，即謂「控制反轉」</p>
+<h2 id="java視角">Java視角</h2>
+<p>非常正統，程式就是這麼寫的</p>
+<p>這個定位服務完美切割了調用端和具體實現</p>
+<p>調用端只需要知道一堆接口，並靠着這些接口尋找一個給定的服務，至於那個服務是什麼他不需要知道，只要依賴約定的接口即可</p>
+<p>而具體實現的註冊被放在了 main 例程或其他「有權力」的類</p>
+<p>就算具體實現切換了，優化了，波動也只限在接口之下，上面的邏輯完全不用改一個字元</p>
+<h2 id="rust視角">Rust視角</h2>
+<p>問題在於這是Rust不是Java</p>
+<p>Rust 的語言哲學自始至終不假定一個全局的 IoC 容器存在</p>
+<p>相反，其傾向於透過所有權模型與型別系統，讓依賴在編譯期就被確認並固定下來</p>
+<p>導致把「典型 Java 式的 IoC」直接搬過來往往會顯得多此一舉，甚至有點格格不入</p>
+<p>具體來說有幾點差異：</p>
+<ol>
+<li>
+<p>Rust透過 borrow checker 嚴格控制物件何時被創建、何時被銷毀,這些被編譯器與所有權規則保證，不再需要額外的容器來代管</p>
+</li>
+<li>
+<p>介面+容器的組合是Java的主流解耦方式換做 Rust，更 idiomatic 的做法是直接在函數簽名上使用泛型約束，例如：</p>
+<div class="pre_content"><pre><code class="language-rust">fn do_work&lt;T: ChatMapService&gt;(svc: &amp;T) { /* ... */ }
+</code></pre></div>
+</li>
+</ol>
+<p>呼叫方決定傳入哪個具體實現</p>
+<p>這種靜態多型由編譯器優化，幾乎不需要透過動態查表獲取服務</p>
+<ol start="3">
+<li>顯式依賴優於隱式定位
+Rust 社群傾向於顯式傳遞依賴（constructor injection / 函式參數注入）
+這樣在閱讀程式碼時，依賴關係是一目了然的
+測試時只要傳入一個假的實現即可，不需要額外建構或重置全域容器</li>
+</ol>
+<p>因此，Rust 專案常見的替代模式是：</p>
+<ul>
+<li>
+<p>建構時注入</p>
+<div class="pre_content"><pre><code class="language-rust">pub struct App {
+    chat_maps: Arc&lt;dyn ChatMapService&gt;,
+}
+
+impl App {
+    pub fn new(chat_maps: Arc&lt;dyn ChatMapService&gt;) -&gt; Self {
+        Self { chat_maps }
+    }
+
+    pub async fn run(&amp;self) {
+        let groups = self.chat_maps.list_groups().await.unwrap();
+        println!("Groups: {:?}", groups);
+    }
+}
+</code></pre></div>
+<p>依賴在 <code>App</code> 初始化時明確傳入，不再依賴一個全局查表</p>
+</li>
+<li>
+<p>組合器（compositor）模式
+在 <code>main.rs</code> 或一個專門的 builder 裏，把所有具體服務實例建構好，然後交給應用使用
+這樣「依賴的組裝」與「依賴的使用」被清晰地分開，但不需要額外的 IoC 容器</p>
+</li>
+</ul>
+<h2 id="結">結</h2>
+<p>Rust的語言特性使得 IoC 容器在大部分情境下不再必要</p>
+<p>於筆者而言，因爲自己第一語言是Java，總會認爲「少了一層保險」</p>
+<p>但反而正是Rust本身的設計理念：顯式、靜態、零成本抽象</p>
+<p>故當發現自己在 Rust 裏寫出一個 Service Locator，大概率只是「典型 Java 思維」的慣性延伸</p>
+<p>而不是 Rust 社群會推薦的設計手法</p>
+<hr />
+<p class="license">
+  如無特殊說明，所有內容採用
+  <a
+    href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
+    target="_blank"
+    rel="license noopener noreferrer"
+    style="display: inline-block"
+  >CC BY 4.0</a> 協議共享
+</p>
+<p class="post-date">於 2025-10-03 (臺北標準時)</p>
+</article>
+</main>
+</body>
+</html>
