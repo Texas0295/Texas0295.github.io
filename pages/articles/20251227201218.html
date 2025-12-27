@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>[GITHUB]　導入已上傳公鑰的Github用戶的公鑰及其相關基礎設定流程 - Texas0295's blog</title>
+    <meta name="description" content="Texas0295的個人部落格" />
+    <meta http-equiv="content-language" content="zh-hant" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta theme-color="#000000" />
+    <meta name="renderer" content="webkit" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/resources/css/article.css?v=1.1"
+    />
+    <script src="/resources/js/highlight.min.js"></script>
+    <script src="/resources/js/add_code_copy_button.js" defer></script>
+    <script src="/resources/js/add_navigation_bar.js"></script>
+    <script src="/resources/js/add_toc.js"></script>
+    <script>
+        const darkmode = localStorage.getItem("darkmode") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "active" : "disabled");
+        document.documentElement.setAttribute("data-theme", darkmode === "active" ? "dark" : "light");
+        localStorage.setItem("darkmode", darkmode);
+    </script>
+    <script>
+        window.addEventListener('load', () => {
+        const toc = document.querySelector('.toc-container');
+        if (window.innerWidth <= 1023 && toc) {
+            toc.classList.remove('expanded');
+            toc.classList.add('collapsed');
+        }
+        });
+    </script>
+  </head>
+  <body>
+    <header>
+      <button id="theme-switch">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z"
+          />
+        </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z"
+          />
+        </svg>
+      </button>
+    </header>
+    <script src="/resources/js/darkmode.js"></script>
+    <div class="navigation-bar">
+      <a href="/"
+        ><img src="/resources/img/site/info-img.jpg" class="logo"
+      /></a>
+    <nav id="navigation-bar" class="menu"></nav>
+    <button class="toc-toggle-btn" onclick="toggleTOC()">☰</button>
+    </div>
+    <main>
+        <article class="article-content"><div class="toc-container">
+<ul class="toc">
+<li class="toc-level-1"><a href="#github導入已上傳公鑰的github用戶的公鑰及其相關基礎設定流程">[GITHUB]　導入已上傳公鑰的Github用戶的公鑰及其相關基礎設定流程</a></li>
+<li class="toc-level-2"><a href="#知道email後傳統上如何獲取一個公鑰">知道email後，傳統上如何獲取一個公鑰</a></li>
+<li class="toc-level-2"><a href="#透過github獲取公鑰">透過Github獲取公鑰</a></li>
+<li class="toc-level-2"><a href="#本機信任此公鑰">本機信任此公鑰</a></li>
+</ul>
+</div>
+
+<h1 id="github導入已上傳公鑰的github用戶的公鑰及其相關基礎設定流程">[GITHUB]　導入已上傳公鑰的Github用戶的公鑰及其相關基礎設定流程</h1>
+<p>（註：以下範例輸出為日文環境下的 GnuPG 顯示，其他語言環境字樣可能略有差異）</p>
+<p>在Github上遇到一個Verified commit卻因爲保守的社交態度以至於無法獲取對方的公鑰嗎？</p>
+<p>通讀本文後，您將會知道如何獲取對方的公鑰並導入到自己的gpg內，爲之後依據該公鑰所進行的「驗簽」，「加密」操作提供基礎</p>
+<h2 id="知道email後傳統上如何獲取一個公鑰">知道email後，傳統上如何獲取一個公鑰</h2>
+<p>傳統OpenPGP的使用情境下，最直覺的方案是找到一個 <strong>Key Server</strong> （例如SKS/keyopenpgp/keyserverubuntu），有自有網域的一般還會Host到WKD上供自動發現</p>
+<p>部分人也會選擇在他們個人網站上的某個地方存放<code>.asc</code>檔案以供下載</p>
+<p>但在社群實踐上，也依然也有數量可觀的使用者不會選擇傳入到Key Server</p>
+<p>對於這一部分的使用者而言，傳統的 <code>--recv-keys</code> 是不能讓他們的公鑰檔案被發現的</p>
+<h2 id="透過github獲取公鑰">透過Github獲取公鑰</h2>
+<p>是否認爲已無路可走，只能打開草稿給當事人寫一封聲情並茂的信來請求一份<code>.asc</code>檔案了？</p>
+<p>但您是看到了一個 <strong>在Github上的Verified commit</strong>，並且透過點擊它知道不是Github簽的，而是 <strong>This commit was signed with the committer's verified signature.</strong></p>
+<p>因此他肯定是Github用戶並已經 <strong>傳入了他的公鑰至Github</strong></p>
+<p>而Github本身可以透過以下路徑獲取一個用戶下的GPG公鑰：</p>
+<div class="pre_content"><pre><code>https://github.com/&lt;username&gt;.gpg
+</code></pre></div>
+<p>該網址會直接返回對方在 GitHub 帳號中註冊過的 ASCII armored public key，因此可直接導入 GnuPG</p>
+<p>例如：</p>
+<div class="pre_content"><pre><code>~ &gt; curl https://github.com/doctor.gpg | gpg --import
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  2455 100  2455   0     0  6873     0  --:--:-- --:--:-- --:--:--  6876
+gpg: 鍵AAAAAAAAAAAAAAAA: 公開鍵"doctor &lt;doctor.code@hotmail.com&gt;"をインポートしました
+gpg:           処理数の合計: 1
+gpg:             インポート: 1
+</code></pre></div>
+<p>若導入成功，GPG會顯示新鍵被導入，並提示對應的UID</p>
+<p>之後您就可以利用這個公鑰做許多事情</p>
+<p>例如透過<code>git log --show-signature</code>來查看有其署名的commit物件：</p>
+<div class="pre_content"><pre><code>commit &lt;hash&gt; (HEAD -&gt; main, origin/main, origin/HEAD) 
+gpg: 2025年12月27日 13時12分18秒 CSTに施された署名 
+gpg:                RSA鍵AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAを使用 
+gpg: "doctor &lt;doctor.code@hotmail.com&gt;"からの正しい署名 [不明の] 
+gpg: *警告*: この鍵は信用できる署名で証明されていません! 
+gpg: この署名が所有者のものかどうかの検証手段がありません。
+主鍵フィンガープリント: AAAA AAAA AAAA AAAA AAAA AAAA AAAA AAAA AAAA AAAA 
+Author: doctor &lt;doctor.code@hotmail.com&gt; 
+Date: Sat Dec 27 13:12:18 2025 +0800 
+     fix bugs
+</code></pre></div>
+<h2 id="本機信任此公鑰">本機信任此公鑰</h2>
+<p>到此，您已經解決了如何導入的問題，但在檢查的時候，gpg會抱怨無法証明這把鑰匙是可信任的</p>
+<p>不是說這把鑰匙無效，署名認證本身已經通過，只是其未被本地的信任網絡（Web of Trust, WoT）所背書</p>
+<p>自己之前寫過的一篇 <a href="https://texas0295.top/pages/articles/20250908015501.html">文章</a> 解釋了WoT，這裏不再贅述</p>
+<p>正常的安全語境下，雙方可能非得要碰個頭</p>
+<p>但有鑑於會面成本，且 GitHub 能提供帳號層面的「公鑰認領」線索（platform trust），在只需要確認「某 GitHub 帳號所使用的簽名鍵」的情境下，可以考慮做一次本機簽署（local sign）</p>
+<p>（需要注意的是這仍不等同於線下核對 fingerprint 或 WoT 的強綁定，只是把信任錨點放在 GitHub 帳號體系上）</p>
+<p>本機簽署（--lsign-key）會在不污染 WoT 的情況下，對該 key 的 UID 做不可匯出的本機認證。完成後，GnuPG 在驗簽時通常不再提示「缺乏可信簽名背書」的警告（或 validity 顯示提升，依環境略有差異）</p>
+<p>具體操作方法爲：</p>
+<div class="pre_content"><pre><code>gpg --lsign-key &lt;key-id or uid, email&gt;
+</code></pre></div>
+<p>例如：</p>
+<div class="pre_content"><pre><code>~ &gt; gpg --lsign-key doctor.code@hotmail.com
+
+pub  rsa3072/AAAAAAAAAAAAAAAA
+     作成: 2025-09-06  有効期限: 無期限      利用法: SC  
+     信用: 不明の     有効性: 不明の
+sub  rsa3072/ABCAAAAAAAAAAAAA
+     作成: 2025-09-06  有効期限: 無期限      利用法: E   
+[  不明  ] (1). doctor &lt;doctor.code@hotmail.com&gt;
+
+
+pub  rsa3072/ABCDAAAAAAAAAAAA
+     作成: 2025-09-06  有効期限: 無期限      利用法: SC  
+     信用: 不明の     有効性: 不明の
+    主鍵フィンガープリント: AAAA AAAA AAAA AAAA AAAA AAAA AAAA AAAA AAAA AAAA 
+
+     doctor &lt;doctor.code@hotmail.com&gt;
+
+本当にこの鍵にあなたの鍵"Texas0295 &lt;kimura@texas0295.top&gt;"で署名してよいですか
+(BFE26B74CDC851FB)
+
+署名は、エクスポート不可に設定されます。
+
+本当に署名しますか? (y/N) y
+
+</code></pre></div>
+<ul>
+<li>僅對本機生效</li>
+<li>不會被 export</li>
+<li>不會影響 Web of Trust</li>
+<li>不會替對方對外背書</li>
+</ul>
+<p>之後再用git之類的驗簽，應當就會得到一個：</p>
+<div class="pre_content"><pre><code>gpg: 2025年12月27日 13時12分18秒 CSTに施された署名
+gpg:                RSA鍵AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAを使用
+gpg: "doctor &lt;doctor.code@hotmail.com&gt;"からの正しい署名 [充分]
+</code></pre></div>
+<hr />
+<p class="license">
+  如無特殊說明，所有內容採用
+  <a
+    href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
+    target="_blank"
+    rel="license noopener noreferrer"
+    style="display: inline-block"
+  >CC BY 4.0</a> 協議共享
+</p>
+<p class="post-date">於 2025-12-28 (臺北標準時)</p>
+</article>
+</main>
+</body>
+</html>
