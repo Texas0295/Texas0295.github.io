@@ -61,12 +61,15 @@
 <main style="padding-top:5px;line-height: 1.7;font-size: 15pt;">
   <h1> PGP 公開鍵</h1>
   <p>
-    您可透過 <a href="https://keys.openpgp.org" target="_blank">keys.openpgp.org</a> 或者使用 WKD 查詢我的公開金鑰<br>
-    若使用支援 WKD 的郵件客戶端，亦可於信件撰寫階段自動取得密鑰
+    您可透過SKS keyserver hkps://pgp.asia 或者使用 WKD 查詢我的公開金鑰<br>
+    若使用支援 WKD 的郵件客戶端，亦可於信件撰寫階段自動取得密鑰<br>
   </p>
   <p>
     GnuPG 指令查詢範例如下：<br>
-    <code>gpg --auto-key-locate wkd --locate-key your@email.com</code>
+    WKD：<br>
+    <code>gpg --auto-key-locate clear,wkd --locate-keys user@email.com</code> <br>
+    SKS：<br>
+    <code>gpg --keyserver hkps://pgp.asia --search-keys 'email or uid or sth.'</code>
   </p>
   <p>
     建議比對如下指紋後再導入：
@@ -81,13 +84,13 @@
   </p>
   <p><i>若您收到來自本人的加密郵件或簽章內容，但指紋不符，請立即與我聯絡。</i></p>
   <h2> 變更記錄： </h2>
-  <p>2025/8/29 (UTC+8): revoke uid Texas0295(Identity Only)&lt;texas0295@outlook.com&gt;</p>
-  <p>2025/8/29 (UTC+8): add uid Texas0295&lt;texas0295@outlook.com&gt;</p>
-  <p>2025/8/29 (UTC+8): add uid Texas0295&lt;contact@texas0295.top&gt;</p>
-  <p>2025/8/29 (UTC+8): add uid 木村幸之助&lt;contact@texas0295.top&gt;</p>
-  <p>2025/9/1 (UTC+8): revoke uid 木村幸之助&lt;contact@texas0295.top&gt;</p>
-  <p>2025/9/9 (UTC+8): add uid Texas0295&lt;kimura@texas0295.top&gt;</p>
-  <p>2025/12/27 (UTC+8): revoke uid Texas0295&lt;contact@texas0295.top&gt;</p>
+  <p>2025/8/29 (UTC+8): revoke uid Texas0295(Identity Only)&lt;texas0295@outlook.com&gt; due to: seems like a label, not good</p>
+  <p>2025/8/29 (UTC+8): add uid Texas0295&lt;texas0295@outlook.com&gt; due to: replace with a pure uid</p>
+  <p>2025/8/29 (UTC+8): add uid Texas0295&lt;contact@texas0295.top&gt; due to: add contact email</p>
+  <p>2025/8/29 (UTC+8): add uid 木村幸之助&lt;contact@texas0295.top&gt; due to: uid support CJK so I add my japanese name</p>
+  <p>2025/9/1 (UTC+8): revoke uid 木村幸之助&lt;contact@texas0295.top&gt; due to: seems not very international, give up</p>
+  <p>2025/9/9 (UTC+8): add uid Texas0295&lt;kimura@texas0295.top&gt; due to: add dev email</p>
+  <p>2025/12/27 (UTC+8): revoke uid Texas0295&lt;contact@texas0295.top&gt; due to: merge contact function to dev email</p>
 </main>
   <hr />
   <p><i>「草はしおれ、花はしぼむ、しかし神のおことばは、いつまでもすれたることがない」(イザヤ書40:8)</i></p>
