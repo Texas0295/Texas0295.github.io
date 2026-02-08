@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Sakinorva Cognitive Function Domain Test Result- Texas0295's blog</title>
+    <meta name="description" content="Texas0295的個人部落格" />
+    <meta http-equiv="content-language" content="zh-hant" />
+    <link rel="stylesheet" type="text/css" href="/resources/css/common.css?v=1.2" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta theme-color="#000000" />
+    <meta name="renderer" content="webkit" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <script src="/resources/js/highlight.min.js"></script>
+    <script src="/resources/js/add_code_copy_button.js" defer></script>
+    <script src="/resources/js/add_navigation_bar.js"></script>
+    <script src="/resources/js/add_external_modal_confirm.js" defer></script>
+    <script>
+        const darkmode = localStorage.getItem("darkmode") ||
+            (window.matchMedia("(prefers-color-scheme: dark)").matches ? "active" : "disabled");
+        document.documentElement.setAttribute("data-theme", darkmode === "active" ? "dark" : "light");
+        localStorage.setItem("darkmode", darkmode);
+    </script>
+</head>
+
+<body>
+    <header>
+        <button id="theme-switch">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+                <path
+                    d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+                <path
+                    d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z" />
+            </svg>
+        </button>
+    </header>
+    <script src="/resources/js/darkmode.js"></script>
+    <div class="navigation-bar">
+        <a href="/"><img src="/resources/img/site/info-img.jpg" class="logo" /></a>
+        <nav id="navigation-bar" class="menu"></nav>
+    </div>
+
+    <style>
+        .dashboard-wrapper {
+            width: 100%;
+            margin: 20px 0;
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+
+        #report-date {
+            margin-bottom: 12px;
+            font-family: 'Cascadia Code', monospace;
+            font-size: 0.75rem;
+            opacity: 0.5;
+            text-align: right;
+            letter-spacing: 1px;
+        }
+
+        .grid-header {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .type-card {
+            background: var(--base-variant-color);
+            padding: 1.25rem;
+            border-radius: 8px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .type-label {
+            font-size: 0.65rem;
+            opacity: 0.6;
+            text-transform: uppercase;
+            font-weight: 800;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .type-value {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #2563eb;
+        }
+
+        .main-layout {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .chart-side {
+            flex: 1;
+            min-width: 320px;
+            background: var(--base-variant-color);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 20px;
+        }
+
+        .data-side {
+            flex: 1.4;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .func-row {
+            background: var(--base-variant-color);
+            padding: 12px 16px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .f-name {
+            width: 35px;
+            font-weight: 900;
+            color: #2563eb;
+            font-family: 'Cascadia Code', monospace;
+        }
+
+        .f-bar-container {
+            flex-grow: 1;
+            display: flex;
+            height: 16px;
+            background: rgba(128, 128, 128, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0 16px;
+        }
+
+        .seg {
+            height: 100%;
+            transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .seg-l {
+            background: #93c5fd;
+        }
+
+        .seg-a {
+            background: #60a5fa;
+        }
+
+        .seg-p {
+            background: #3b82f6;
+        }
+
+        .seg-v {
+            background: #2563eb;
+        }
+
+        .f-score {
+            width: 30px;
+            text-align: right;
+            font-weight: 800;
+            font-size: 0.95rem;
+            font-family: 'Cascadia Code', monospace;
+        }
+
+        .f-pos {
+            width: 45px;
+            text-align: right;
+            font-size: 0.8rem;
+            font-weight: bold;
+            font-family: 'Cascadia Code', monospace;
+        }
+
+        @media (max-width: 768px) {
+            .main-layout {
+                flex-direction: column;
+            }
+
+            .chart-side {
+                width: 100%;
+                min-width: unset;
+                position: relative;
+                top: 0;
+                padding: 15px;
+            }
+
+            .f-bar-container {
+                margin: 0 10px;
+            }
+        }
+    </style>
+
+    <style>
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid var(--text-color);
+            padding-bottom: 10px;
+            margin-bottom: 5px;
+        }
+
+        .dashboard-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin: 0;
+            color: var(--text-color);
+            letter-spacing: -0.5px;
+        }
+
+        .test-link {
+            font-family: 'Cascadia Code', monospace;
+            font-size: 0.85rem;
+            text-decoration: none;
+            color: var(--link-color);
+            border: 1px solid var(--link-color);
+            padding: 2px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .test-link:hover {
+            background: var(--link-color);
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+
+    <div class="dashboard-wrapper">
+
+        <h1 class="dashboard-title">Sakinorva Cognitive Function Domain Test</h1>
+        <a href="https://sakinorva.net/test/function_bunya" target="_blank" class="test-link">(Click) Test Site</a>
+    </div>
+
+    <div id="report-date">DATA SYNCING...</div>
+    <div class="grid-header" id="summary-view"></div>
+    <div class="main-layout">
+        <div class="chart-side">
+            <div class="canvas-container" style="position: relative; height:300px; width:100%;">
+                <canvas id="mbtiRadar"></canvas>
+            </div>
+            <div
+                style="font-size: 0.6rem; margin-top: 15px; opacity: 0.4; text-align: center; font-family: 'Cascadia Code';">
+                L: Latent / A: Active / P: Aptitudinal / V: Valuing
+            </div>
+        </div>
+        <div class="data-side" id="detail-view"></div>
+    </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        (function () {
+            let mbtiChart = null;
+            let cachedData = null;
+
+            async function init() {
+                try {
+                    const res = await fetch('/resources/json/sakinorva.json');
+                    cachedData = await res.json();
+
+                    renderStatic(cachedData);
+                    renderRadar(cachedData.details);
+
+                    const themeBtn = document.getElementById('theme-switch');
+                    if (themeBtn) {
+                        themeBtn.addEventListener('click', () => {
+                            setTimeout(() => renderRadar(cachedData.details), 100);
+                        });
+                    }
+
+                    window.addEventListener('resize', () => {
+                        if (mbtiChart) mbtiChart.resize();
+                    });
+
+                } catch (e) {
+                    document.getElementById('report-date').innerText = 'JSON LOAD ERROR';
+                    console.error(e);
+                }
+            }
+
+            function renderStatic(data) {
+                document.getElementById('report-date').innerText = `DATE // ${data.date || 'N/A'}`;
+
+                const sumBox = document.getElementById('summary-view');
+                sumBox.innerHTML = Object.entries(data.summary).map(([k, v]) => `
+            <div class="type-card">
+                <span class="type-label">${k}</span>
+                <div class="type-value">${v}</div>
+            </div>
+        `).join('');
+
+const detBox = document.getElementById('detail-view');
+detBox.innerHTML = data.details.map(d => `
+    <div class="func-row">
+        <div class="f-name">${d.n}</div>
+        <div class="f-bar-container">
+            <div class="seg seg-l" style="width:${(d.l/d.t)*100}%" title="Latent: ${d.l} (潛在能力：非自覺的基礎強度)"></div>
+            
+            <div class="seg seg-a" style="width:${(d.a/d.t)*100}%" title="Active: ${d.a} (活躍程度：日常使用的熟練度)"></div>
+            
+            <div class="seg seg-p" style="width:${(d.p/d.t)*100}%" title="Aptitudinal: ${d.p} (天賦傾向：處理資訊的直覺準確性)"></div>
+            
+            <div class="seg seg-v" style="width:${(d.v/d.t)*100}%" title="Valuing: ${d.v} (重視程度：主觀上對該功能的認同感)"></div>
+        </div>
+        <div class="f-score">${d.t}</div>
+        <div class="f-pos" style="color:${d.pos >= 0 ? '#059669' : '#dc2626'}; cursor: help;" 
+             title="${d.pos >= 0 ? 'Positivity: 積極建設性應用' : 'Positivity: 防禦性或抵觸性應用'}">
+            ${d.pos >= 0 ? '+' : ''}${d.pos}
+        </div>
+    </div>
+`).join('');            }
+
+            function renderRadar(details) {
+                const ctx = document.getElementById('mbtiRadar');
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                const labelColor = isDark ? '#bdbdbd' : '#111111';
+                const gridColor = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)';
+
+                if (mbtiChart) mbtiChart.destroy();
+
+                mbtiChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: details.map(x => x.n),
+                        datasets: [{
+                            data: details.map(x => x.t),
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#2563eb'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                angleLines: {color: gridColor},
+                                grid: {color: gridColor},
+                                pointLabels: {
+                                    color: labelColor,
+                                    font: {family: 'Cascadia Code', size: 14, weight: '900'}
+                                },
+                                ticks: {display: false},
+                                suggestedMin: 0,
+                                suggestedMax: 85
+                            }
+                        },
+                        plugins: {legend: {display: false}}
+                    }
+                });
+            }
+
+            init();
+        })();
+    </script>
+
+</body>
