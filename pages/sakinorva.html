@@ -44,6 +44,10 @@
     <style>
         .dashboard-wrapper {
             width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        .dashboard-wrapper {
             margin: 20px 0;
             color: var(--text-color);
             line-height: 1.5;
@@ -193,6 +197,35 @@
                 margin: 0 10px;
             }
         }
+
+        @media (max-width: 768px) {
+            .main-layout {
+                display: block;
+                width: 100%;
+            }
+
+            .chart-side {
+                width: 100% !important;
+                min-width: 0 !important;
+                box-sizing: border-box;
+                margin-bottom: 20px;
+            }
+
+            .canvas-container {
+                width: 100% !important;
+                height: auto !important;
+                aspect-ratio: 1 / 1;
+            }
+
+            .func-row {
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+
+            .f-bar-container {
+                margin: 0 6px;
+            }
+        }
     </style>
 
     <style>
@@ -302,18 +335,18 @@
             </div>
         `).join('');
 
-const detBox = document.getElementById('detail-view');
-detBox.innerHTML = data.details.map(d => `
+                const detBox = document.getElementById('detail-view');
+                detBox.innerHTML = data.details.map(d => `
     <div class="func-row">
         <div class="f-name">${d.n}</div>
         <div class="f-bar-container">
-            <div class="seg seg-l" style="width:${(d.l/d.t)*100}%" title="Latent: ${d.l} (潛在能力：非自覺的基礎強度)"></div>
+            <div class="seg seg-l" style="width:${(d.l / d.t) * 100}%" title="Latent: ${d.l} (潛在能力：非自覺的基礎強度)"></div>
             
-            <div class="seg seg-a" style="width:${(d.a/d.t)*100}%" title="Active: ${d.a} (活躍程度：日常使用的熟練度)"></div>
+            <div class="seg seg-a" style="width:${(d.a / d.t) * 100}%" title="Active: ${d.a} (活躍程度：日常使用的熟練度)"></div>
             
-            <div class="seg seg-p" style="width:${(d.p/d.t)*100}%" title="Aptitudinal: ${d.p} (天賦傾向：處理資訊的直覺準確性)"></div>
+            <div class="seg seg-p" style="width:${(d.p / d.t) * 100}%" title="Aptitudinal: ${d.p} (天賦傾向：處理資訊的直覺準確性)"></div>
             
-            <div class="seg seg-v" style="width:${(d.v/d.t)*100}%" title="Valuing: ${d.v} (重視程度：主觀上對該功能的認同感)"></div>
+            <div class="seg seg-v" style="width:${(d.v / d.t) * 100}%" title="Valuing: ${d.v} (重視程度：主觀上對該功能的認同感)"></div>
         </div>
         <div class="f-score">${d.t}</div>
         <div class="f-pos" style="color:${d.pos >= 0 ? '#059669' : '#dc2626'}; cursor: help;" 
@@ -321,7 +354,8 @@ detBox.innerHTML = data.details.map(d => `
             ${d.pos >= 0 ? '+' : ''}${d.pos}
         </div>
     </div>
-`).join('');            }
+`).join('');
+            }
 
             function renderRadar(details) {
                 const ctx = document.getElementById('mbtiRadar');
