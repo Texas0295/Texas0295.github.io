@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>拆一個C宣告 - Texas0295's blog</title>
+    <meta name="description" content="Texas0295的個人部落格" />
+    <meta http-equiv="content-language" content="zh-hant" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta theme-color="#000000" />
+    <meta name="renderer" content="webkit" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="/resources/css/article.css?v=1.1"
+    />
+    <script src="/resources/js/highlight.min.js"></script>
+    <script src="/resources/js/add_code_copy_button.js" defer></script>
+    <script src="/resources/js/add_navigation_bar.js"></script>
+    <script src="/resources/js/add_toc.js"></script>
+    <script>
+        const darkmode = localStorage.getItem("darkmode") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "active" : "disabled");
+        document.documentElement.setAttribute("data-theme", darkmode === "active" ? "dark" : "light");
+        localStorage.setItem("darkmode", darkmode);
+    </script>
+    <script>
+        window.addEventListener('load', () => {
+        const toc = document.querySelector('.toc-container');
+        if (window.innerWidth <= 1023 && toc) {
+            toc.classList.remove('expanded');
+            toc.classList.add('collapsed');
+        }
+        });
+    </script>
+  </head>
+  <body>
+    <header>
+      <button id="theme-switch">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z"
+          />
+        </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#e8eaed"
+        >
+          <path
+            d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z"
+          />
+        </svg>
+      </button>
+    </header>
+    <script src="/resources/js/darkmode.js"></script>
+    <div class="navigation-bar">
+      <a href="/"
+        ><img src="/resources/img/site/info-img.jpg" class="logo"
+      /></a>
+    <nav id="navigation-bar" class="menu"></nav>
+    <button class="toc-toggle-btn" onclick="toggleTOC()">☰</button>
+    </div>
+    <main>
+        <article class="article-content"><div class="toc-container">
+<ul class="toc">
+<li class="toc-level-1"><a href="#拆一個c宣告">拆一個C宣告</a></li>
+</ul>
+</div>
+
+<h1 id="拆一個c宣告">拆一個C宣告</h1>
+<div class="pre_content"><pre><code class="language-c">int *(*(*(**x[])(char*, int*(*)(char*)))[])(char**, char*(*)());
+</code></pre></div>
+<p>從meme拆出來的，那麼稍微的讀一下好了</p>
+<p>x 是一個陣列，存了指向函式指標的指標</p>
+<p>這個函式指標接受一個char指標，和另外一個接受一個char指標回傳一個int指標的函式指標</p>
+<p>其回傳一個指向陣列的指標，陣列裏面存的還是一個函式指標</p>
+<p>這個函式指標接受一個char雙重指標，和一個無參並回傳一個char指標的函式指標</p>
+<p>其回傳一個int指標</p>
+<p>用法大概是送一個字串和一個轉換函式，拿到一組行爲，再挑一個送資料和輔助函式，拿到int*</p>
+<p>其集合了工廠，策略表和結果三位一體</p>
+<p>非常不錯，愛來自<code>BiFunction&lt;String, Function&lt;Function&lt;Integer, Runnable[]&gt;[]&gt;, Function&lt;String[], Function&lt;String, Integer&gt;[]&gt;&gt;[][] x = null;</code></p>
+<p>但唯一的問題就是寫這個東西的人最好只是寫着玩，或者真的需要兩段式決策帶來的動態轉圜空間</p>
+<p>否則就有一點點的不是人類</p>
+<p>另外如果存在複數個工廠導引表（在某種複雜的外掛系統）</p>
+<p>其實可以改進成</p>
+<div class="pre_content"><pre><code class="language-c">    int*(*(*(**x[])(char*, int* (* (* (*const volatile)(int))[])(const char*)))[])(char**, char*(*)());
+</code></pre></div>
+<p>加了一個函數陣列，每個函數接受一個 唯讀char*，返回 int*，而這個函數陣列本身是另一個函數的返回值</p>
+<p>其函數指標易變動，強制每次從記憶體讀取並唯讀，接受一個 int 作參數，實際上是開始用數字選導引表本身</p>
+<p>變成三段式動態決策，且一段決策在高危環境</p>
+<p>當然導引表，策略表這兩個是現說的，有相近的概念自動對應即可</p>
+<p>雖然這種程度的大解耦是否值得有待商榷，但可以肯定的是絕對不可能出現在協作環境</p>
+<p>實際測試下來確實在功能上非常完美，只要不去看那一串東西，該做的都做了:</p>
+<div class="pre_content"><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+int global_val = 1;
+
+int* final_target(char** a, char*(*b)()) {
+    printf("%s Says: %s\n",*a,b());
+    return &amp;global_val;
+}
+
+int* (*level2_array[2])(char**, char*(*)()) = { final_target, NULL };
+
+/*
+ * 這一個系列都沒被invoke，佔位用,雖然也可以invoke
+*/
+int* inner_func(const char* s) {
+    (void) s;
+    return NULL; 
+}
+int* (*inner_ptr_array[1])(const char*) = { inner_func };
+int* (* (* complex_arg_func(int n))[])(const char*) {
+    (void) n;
+    return &amp;inner_ptr_array;
+}
+
+int* (*(*target_func(char* s, int* (* (* (p)(int))[])(const char*)))[])(char**, char*(*)()) {
+    /*　這裏就可以動 msg s 和那個 complex_arg_func(int) 
+     *  比如什麼 result = (*(*complex_arg_func(1))[0])("何意味");
+     * */
+    (void) s;
+    (void) p;
+    return &amp;level2_array;
+}
+
+int* (*(*(*ptr_to_target_func)(char*, int* (* (* (*)(int))[])(const char*)))[])(char**, char*(*)()) = target_func;
+int* (*(*(*(*ptr_to_ptr_to_target_func))(char*, int* (* (* (*)(int))[])(const char*)))[])(char**, char*(*)()) = &amp;ptr_to_target_func;
+
+char* callback_impl() { return "桜小路ルナ様"; }
+
+int main() {
+    int* result = 0;
+    char* msg = "Texas0295";
+    char** msg_ptr = &amp;msg;
+    int* (*(* (* const volatile func)(int))[])(const char*) = complex_arg_func;
+
+    /* 萬物起源這一塊 */
+    int* (*(*(**x[1])(char*, int* (*(* (* const volatile)(int))[])(const char*)))[])(char**, char*(*)());
+    x[0] = ptr_to_ptr_to_target_func;
+
+     /* 
+     * x[0]解一次，*x[0]解一次拿到target_func -&gt;　一次週轉拿工廠導引表
+     * 現在執行那個target_func，傳一個msg和comple_arg_func。最後拿到一個level2_array -&gt;　二次週轉拿策略表
+     * 寫0拿函式，傳msg_ptr,和callback_impl給那個函式 -&gt; 三次週轉執行選定策略
+     * 最後拿到一個42
+    */
+    result = (*(*(*x[0])(msg, func))[0])(msg_ptr, callback_impl);
+
+    if (result) {
+        printf("Result: %d\n", *result);
+    }
+
+    return 0;
+}
+</code></pre></div>
+<p>實際結果：</p>
+<div class="pre_content"><pre><code class="language-bash">~/c_note &gt; gcc -Wall -Wextra -Wpedantic -Werror -std=c89 -o main pointer.c &amp;&amp; ./main
+Texas0295 Says: 桜小路ルナ様
+Result: 1
+~/c_note &gt; 
+</code></pre></div>
+<p>用<code>typedef</code>翻過來也一樣</p>
+<div class="pre_content"><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+typedef int* (*tableDirector)(const char*);
+typedef char* (*hardwareStrategy)();
+
+typedef int* (*hardwareExecutor)(char**, hardwareStrategy);
+typedef tableDirector* (*const volatile hardwareChooser)(int); /*　工廠導引表 */
+
+typedef hardwareExecutor* (*hardwareExecutorGetter)(char*s, hardwareChooser);
+
+int global_val = 42;
+
+int* final_target(char** a, hardwareStrategy b) {
+    printf("%s Says: %s\n",*a,b());
+    return &amp;global_val;
+}
+
+hardwareExecutor executors[2] = {final_target, NULL};
+
+int* inner_func(const char* s) { 
+    (void) s; /* 必要的佔位，下同*/
+    return NULL; 
+}
+tableDirector directors[1] = { inner_func };
+tableDirector * hw_chooser(int n) {
+    (void) n;
+    return directors;
+}
+
+hardwareExecutor* choose(char* s, hardwareChooser p) {
+
+    const tableDirector* directors = p(1);
+    tableDirector director = directors[0];
+    const int* result = director(s);
+
+    (void) result;
+    /*
+     * 剩下的可以拿着director算出來的結果進行互動，拿到所有支援的Executor
+     */
+
+    return executors;
+}
+
+char* get_a_str() { return "桜小路ルナ様"; }
+
+int main(){
+
+    char* msg = "Texas0295";
+    char** msg_ptr = &amp;msg;
+    hardwareExecutorGetter getters[1];
+    hardwareExecutorGetter getter;
+    hardwareExecutor* executors;
+    hardwareExecutor executor;
+    hardwareStrategy strategy = get_a_str;
+    hardwareChooser chooser = hw_chooser;
+    int* result = NULL;
+    getters[0] = choose;
+
+    getter = getters[0]; /* 一次週轉拿導引表 */
+
+    executors = getter(msg, chooser); /* 二次週轉拿執行列 */
+    executor = executors[0];
+    result = executor(msg_ptr, strategy); /* 三次週轉執行選定策略*/
+
+    if (result) {
+        printf("Result: %d\n", *result);
+    }
+
+    return 0;
+}
+</code></pre></div>
+<hr />
+<p class="license">
+  如無特殊說明，所有內容採用
+  <a
+    href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1"
+    target="_blank"
+    rel="license noopener noreferrer"
+    style="display: inline-block"
+  >CC BY 4.0</a> 協議共享
+</p>
+<p class="post-date">於 2026-02-16 (臺北標準時)</p>
+</article>
+</main>
+</body>
+</html>
